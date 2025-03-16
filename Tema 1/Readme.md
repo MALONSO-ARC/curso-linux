@@ -2,7 +2,7 @@
 
 ## 1. ¿Qué es un sistema embebido? Definición y características
 
-Un sistema embebido es un sistema de computación especializado diseñado para realizar una función específica dentro de un dispositivo más grande. A diferencia de un ordenador de propósito general, los sistemas embebidos están optimizados para tareas concretas y suelen funcionar en entornos con restricciones de recursos. Estos sistemas pueden encontrarse en una amplia gama de dispositivos, desde electrodomésticos hasta sistemas industriales y automóviles.
+Un sistema embebido es un **sistema de computación** especializado diseñado para realizar una función específica dentro de un dispositivo más grande. A diferencia de un ordenador de propósito general, los sistemas embebidos están optimizados para tareas concretas y suelen funcionar en entornos con restricciones de recursos. Estos sistemas pueden encontrarse en una amplia gama de dispositivos, desde electrodomésticos hasta sistemas industriales y automóviles.
 
 Las principales características de un sistema embebido incluyen:
 
@@ -11,6 +11,49 @@ Las principales características de un sistema embebido incluyen:
 - **Alta fiabilidad y estabilidad**: Dado que muchos sistemas embebidos operan en entornos críticos, es esencial que sean altamente confiables y capaces de funcionar durante largos períodos sin fallos.
 - **Integración con hardware especializado**: Muchos sistemas embebidos incluyen interfaces para sensores, actuadores, y otras formas de hardware personalizado.
 - **Frecuentemente operan en tiempo real**: En aplicaciones donde el tiempo de respuesta es crítico, como en sistemas de control industrial, los sistemas embebidos pueden requerir características de tiempo real.
+
+# Ejemplos de Sistemas Embebidos
+
+A continuación, se presentan ejemplos reales de sistemas embebidos en diferentes sectores.
+
+## 1. Automoción
+- **Unidad de Control Electrónico (ECU)**: Controla la inyección de combustible y la ignición del motor.
+- **Sistema de frenos ABS**: Regula la presión de frenado para evitar bloqueos.
+- **Sistemas de infoentretenimiento**: Pantallas táctiles con navegación GPS y conectividad.
+- **Sensores de aparcamiento y cámaras**: Asistencia en la conducción.
+
+## 2. Dispositivos Médicos
+- **Marcapasos**: Dispositivos implantados que regulan el ritmo cardíaco.
+- **Bombas de insulina**: Dispensan insulina automáticamente según los niveles de glucosa.
+- **Monitores de signos vitales**: Miden parámetros como presión arterial y frecuencia cardíaca.
+
+## 3. Electrónica de Consumo
+- **Smart TVs**: Gestionan la reproducción de contenido y la conectividad.
+- **Asistentes virtuales (Alexa, Google Home)**: Responden a comandos de voz y gestionan dispositivos.
+- **Cámaras digitales**: Controlan el enfoque, la exposición y el procesamiento de imágenes.
+
+## 4. Industria y Automatización
+- **Controladores lógicos programables (PLC)**: Gestionan procesos industriales automatizados.
+- **Robots industriales**: Ejecutan tareas repetitivas con precisión en líneas de ensamblaje.
+- **Sensores de monitoreo en fábricas**: Detectan temperatura, presión y calidad del aire.
+
+## 5. Aeroespacial y Defensa
+- **Sistemas de control de vuelo**: Regulan la navegación y estabilidad de aeronaves.
+- **Drones**: Utilizan sensores embebidos para navegación autónoma.
+- **Sistemas de radar y sonar**: Detectan objetos y analizan el entorno.
+
+## 6. Telecomunicaciones
+- **Routers y módems**: Gestionan la conectividad y transmisión de datos.
+- **Torres de comunicación 5G**: Optimizan la distribución de señales.
+- **Sistemas de cifrado en redes**: Protegen la transmisión de datos.
+
+## 7. Domótica y Hogares Inteligentes
+- **Termostatos inteligentes (Nest, Ecobee)**: Regulan la temperatura del hogar.
+- **Sistemas de seguridad (cámaras y alarmas)**: Monitorean y protegen el hogar.
+- **Electrodomésticos inteligentes**: Lavadoras, refrigeradores y hornos con conectividad.
+
+Estos ejemplos ayudarán a los estudiantes a comprender la amplia aplicación de los sistemas embebidos en la vida cotidiana y en la industria.
+
 
 ## 2. Diferencias entre Linux embebido y Linux de escritorio
 
@@ -34,6 +77,36 @@ Para entender mejor las ventajas e inconvenientes de Linux embebido, es útil co
 ## 4. Historia y evolución de Linux embebido
 
 El uso de Linux en sistemas embebidos ha evolucionado significativamente desde sus inicios. En los años 90, los desarrolladores comenzaron a adaptar el kernel de Linux para dispositivos con recursos limitados, dando lugar a proyectos como:
+
+```
+From: Linus Benedict Torvalds (torvalds@klaava.Helsinki.FI)
+Newsgroups: comp.os.minix
+Subject: What would you like to see most in minix?
+Summary: small poll for my new operating system
+Message-ID: <1991Aug25.205708.9541@klaava.Helsinki.FI>
+Date: 25 Aug 91 20:57:08 GMT
+Organization: University of Helsinki
+
+Hello everybody out there using minix -
+
+I'm doing a (free) operating system (just a hobby, won't be big and
+professional like gnu) for 386(486) AT clones. This has been brewing
+since april, and is starting to get ready. I'd like any feedback on
+things people like/dislike in minix, as my OS resembles it somewhat
+(same physical layout of the file-system (due to practical reasons)
+among other things).
+
+I've currently ported bash(1.08) and gcc(1.40), and things seem to work.
+This implies that I'll get something practical within a few months, and
+I'd like to know what features most people would want. Any suggestions
+are welcome, but I won't promise I'll implement them :-)
+
+Linus (torvalds@kruuna.helsinki.fi)
+
+PS. Yes - it's free of any minix code, and it has a multi-threaded fs.
+It is NOT portable (uses 386 task switching etc), and it probably never
+will support anything other than AT-harddisks, as that's all I have :-(.
+```
 
 # Evolución de Linux Embebido
 

@@ -16,6 +16,10 @@ En los sistemas embebidos, se utilizan diversas arquitecturas de CPU según las 
 | Uso de memoria | Menos eficiente en grandes volúmenes de RAM | Mejor gestión de memoria |
 | Instrucciones | Menos complejas | Mayor capacidad de cómputo |
 
+[Instruction set ARM64](https://developer.arm.com/documentation/ddi0602/2024-12/?lang=en)
+
+![Imagen de prueba](../assets/image_1.jpg)
+
 ## Memoria en sistemas embebidos
 Los sistemas embebidos emplean diferentes tipos de memoria, cada una con características específicas:
 
