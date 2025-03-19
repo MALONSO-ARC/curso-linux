@@ -17,11 +17,13 @@ Para trabajar con Linux embebido, es recomendable usar una distribución de escr
 Opciones para el entorno de desarrollo:
 
 - **Máquinas Virtuales (VMs)**: Aíslan el entorno sin afectar el sistema host.
-- **Contenedores (Docker, Podman)**: Livianos y portables.
+- **Contenedores (Docker, Podman)**: Livianos y portables. Son una muy buena opción para ser usados tanto en el desarrollo (unifica el mismo entorno entre desarrolladores) como apra ser usado en pipelines de CI/CD
 
 Ejemplo de creación de un contenedor con Docker:
 ```bash
-docker run -it --rm ubuntu:latest /bin/bash
+docker pull ubuntu:22.04
+
+docker run -it --name ubuntu_container ubuntu:22.04 bash
 ```
 
 ## Comandos básicos de administración
@@ -119,5 +121,5 @@ dmesg | grep error  # Buscar errores en logs del kernel
 journalctl -xe      # Ver mensajes de error recientes
 ```
 
----
-**Fin del Tema 3**
+Nota: Aquí tienes una "cheatsheet" con los comandos de Linux más usados.
+[Linux Commands CheatSheet](../assets/linux_commands_cheatsheet.pdf)
