@@ -1,4 +1,4 @@
-# Tema 1 - Introducción a Linux Embebido
+# Tema 1: Introducción a Linux Embebido
 
 ## 1. ¿Qué es un sistema embebido? Definición y características
 
@@ -12,49 +12,6 @@ Las principales características de un sistema embebido incluyen:
 - **Integración con hardware especializado**: Muchos sistemas embebidos incluyen interfaces para sensores, actuadores, y otras formas de hardware personalizado.
 - **Frecuentemente operan en tiempo real**: En aplicaciones donde el tiempo de respuesta es crítico, como en sistemas de control industrial, los sistemas embebidos pueden requerir características de tiempo real.
 
-# Ejemplos de Sistemas Embebidos
-
-A continuación, se presentan ejemplos reales de sistemas embebidos en diferentes sectores.
-
-## 1. Automoción
-- **Unidad de Control Electrónico (ECU)**: Controla la inyección de combustible y la ignición del motor.
-- **Sistema de frenos ABS**: Regula la presión de frenado para evitar bloqueos.
-- **Sistemas de infoentretenimiento**: Pantallas táctiles con navegación GPS y conectividad.
-- **Sensores de aparcamiento y cámaras**: Asistencia en la conducción.
-
-## 2. Dispositivos Médicos
-- **Marcapasos**: Dispositivos implantados que regulan el ritmo cardíaco.
-- **Bombas de insulina**: Dispensan insulina automáticamente según los niveles de glucosa.
-- **Monitores de signos vitales**: Miden parámetros como presión arterial y frecuencia cardíaca.
-
-## 3. Electrónica de Consumo
-- **Smart TVs**: Gestionan la reproducción de contenido y la conectividad.
-- **Asistentes virtuales (Alexa, Google Home)**: Responden a comandos de voz y gestionan dispositivos.
-- **Cámaras digitales**: Controlan el enfoque, la exposición y el procesamiento de imágenes.
-
-## 4. Industria y Automatización
-- **Controladores lógicos programables (PLC)**: Gestionan procesos industriales automatizados.
-- **Robots industriales**: Ejecutan tareas repetitivas con precisión en líneas de ensamblaje.
-- **Sensores de monitoreo en fábricas**: Detectan temperatura, presión y calidad del aire.
-
-## 5. Aeroespacial y Defensa
-- **Sistemas de control de vuelo**: Regulan la navegación y estabilidad de aeronaves.
-- **Drones**: Utilizan sensores embebidos para navegación autónoma.
-- **Sistemas de radar y sonar**: Detectan objetos y analizan el entorno.
-
-## 6. Telecomunicaciones
-- **Routers y módems**: Gestionan la conectividad y transmisión de datos.
-- **Torres de comunicación 5G**: Optimizan la distribución de señales.
-- **Sistemas de cifrado en redes**: Protegen la transmisión de datos.
-
-## 7. Domótica y Hogares Inteligentes
-- **Termostatos inteligentes (Nest, Ecobee)**: Regulan la temperatura del hogar.
-- **Sistemas de seguridad (cámaras y alarmas)**: Monitorean y protegen el hogar.
-- **Electrodomésticos inteligentes**: Lavadoras, refrigeradores y hornos con conectividad.
-
-Estos ejemplos ayudarán a los estudiantes a comprender la amplia aplicación de los sistemas embebidos en la vida cotidiana y en la industria.
-
-
 ## 2. Diferencias entre Linux embebido y Linux de escritorio
 
 Linux embebido y Linux de escritorio comparten el mismo núcleo (kernel), pero están diseñados para contextos y propósitos diferentes. Mientras que un sistema Linux de escritorio está optimizado para la ejecución de múltiples aplicaciones interactivas con una interfaz gráfica, un sistema Linux embebido está diseñado para ser eficiente y cumplir con requerimientos específicos.
@@ -64,19 +21,28 @@ Algunas diferencias clave son:
 - **Recursos de hardware**: Linux embebido se ejecuta en dispositivos con recursos limitados, como microcontroladores o SoCs (System-on-Chip), mientras que Linux de escritorio puede aprovechar procesadores potentes y grandes cantidades de memoria.
 - **Flexibilidad**: Linux de escritorio es un sistema generalista, capaz de ejecutar múltiples tipos de software, mientras que Linux embebido se configura para un conjunto reducido de aplicaciones.
 - **Interfaz gráfica**: Mientras que Linux de escritorio casi siempre incluye un entorno gráfico como GNOME o KDE, en sistemas embebidos, la presencia de una interfaz gráfica no es obligatoria y en muchos casos se emplean interfaces minimalistas o incluso solo una terminal.
-- **Mantenimiento y actualizaciones**: Los sistemas embebidos suelen ser más estáticos y pueden no actualizarse con la misma frecuencia que un sistema de escritorio.
+- **Mantenimiento y actualizaciones**: Los sistemas embebidos suelen ser más estáticos y pueden no actualizarse con la misma frecuencia que un sistema de escritorio. Su actualización es un proceso más crítico puesto que puede bloquear el dispositivo.
+
+| Característica        | Linux de Escritorio              | Linux Embebido                     |
+|------------------------|----------------------------------|------------------------------------|
+| Propósito              | Uso general, multitarea          | Funciones específicas             |
+| Hardware               | Potente, sin restricciones       | Limitado, recursos críticos       |
+| Tamaño del sistema     | Grande, muchas dependencias      | Ligero, altamente optimizado       |
+| Interfaces de usuario  | Gráficas (GUI)                   | Frecuentemente sin GUI o minimal   |
+| Tiempo de arranque     | Lento                            | Rápido                            |
+| Actualizaciones        | Regulares, por el usuario        | Controladas por el fabricante      |
+
+
 
 ## 3. Comparativa de Linux embebido con otros sistemas (RTOS, Bare-metal)
 
 Para entender mejor las ventajas e inconvenientes de Linux embebido, es útil compararlo con otras alternativas comunes como los sistemas operativos en tiempo real (RTOS) y los sistemas bare-metal.
 
-- **Linux embebido**: Ofrece multitarea, gestión de memoria y una rica colección de controladores y software. Sin embargo, puede no ser lo suficientemente determinista para aplicaciones de tiempo real estrictas.
+- **Linux embebido**: Ofrece multitarea, gestión de memoria y una rica colección de controladores y software. Sin embargo, puede no ser lo suficientemente **determinista** para aplicaciones de tiempo real estrictas.
 - **RTOS (Real-Time Operating System)**: Diseñados para garantizar tiempos de respuesta predecibles, los RTOS son ideales para aplicaciones que requieren ejecución en plazos estrictos, como sistemas de control en automoción o robótica.
 - **Bare-metal**: No utiliza un sistema operativo, sino que ejecuta código directamente en el hardware. Esto proporciona el máximo control y velocidad, pero aumenta la complejidad del desarrollo y mantenimiento.
 
 ## 4. Historia y evolución de Linux embebido
-
-El uso de Linux en sistemas embebidos ha evolucionado significativamente desde sus inicios. En los años 90, los desarrolladores comenzaron a adaptar el kernel de Linux para dispositivos con recursos limitados, dando lugar a proyectos como:
 
 ```
 From: Linus Benedict Torvalds (torvalds@klaava.Helsinki.FI)
@@ -108,15 +74,17 @@ It is NOT portable (uses 386 task switching etc), and it probably never
 will support anything other than AT-harddisks, as that's all I have :-(.
 ```
 
-# Evolución de Linux Embebido
+El uso de Linux en sistemas embebidos ha evolucionado significativamente desde sus inicios. En los años 90, los desarrolladores comenzaron a adaptar el kernel de Linux gracias a su licencia GNU y a su espiritu basado en la colaboración. De esta forma, el kernel de Linux ha pasado de ser un proyecto personal que "problemente nunca soportará nada que no sea discos duros AT" a ser un kernel portado a decenas de arquitecturas y con soporte para centenas de periféricos.
+
+### Evolución de Linux Embebido
 
 | Año  | Hito                                      | Descripción |
 |------|-------------------------------------------|-------------|
 | **1991** | Lanzamiento de Linux 0.1 | Linus Torvalds publica la primera versión del núcleo de Linux como un sistema operativo de código abierto para PCs IBM. |
 | **1995** | Inclusión de soporte para múltiples arquitecturas | Linux versión 1.2 añade soporte para Alpha, i386, MIPS y SPARC, facilitando su portabilidad a dispositivos embebidos. |
 | **1996** | Inclusión de arquitecturas m68k y PowerPC | Linux 2.0 amplía el soporte a las arquitecturas m68k y PowerPC, comunes en dispositivos embebidos. |
+| **1996** | Inicio del proyecto BusyBox | Bruce Perens inicia BusyBox, creando una suite de utilidades Unix ligeras, ideales para sistemas embebidos debido a su reducido tamaño. |
 | **1997** | Proyecto Linux Router (LRP) | Dave Cinege lanza LRP, utilizando BusyBox para crear un Linux arrancable desde disquete que convierte una PC en un router, uno de los primeros proyectos reales de Linux embebido. |
-| **1998** | Inicio del proyecto BusyBox | Bruce Perens inicia BusyBox, creando una suite de utilidades Unix ligeras, ideales para sistemas embebidos debido a su reducido tamaño. |
 | **1998** | Desarrollo de uClinux | Kenneth Albanowski y D. Jeff Dionne trabajan en uClinux, una versión de Linux para sistemas sin unidad de gestión de memoria (MMU), ampliando el rango de hardware capaz de ejecutar Linux. |
 | **1999** | Lanzamiento de ELKS | Se presenta el Subconjunto de Kernel de Linux Integrable (ELKS), diseñado para ordenadores de 16 bits con recursos de memoria limitados, como los sistemas basados en Intel 8086. |
 | **2001** | Creación de Buildroot | Nace Buildroot como un framework para automatizar la generación de sistemas Linux embebidos minimizados, facilitando la compilación cruzada y la integración de software. |
@@ -127,6 +95,80 @@ will support anything other than AT-harddisks, as that's all I have :-(.
 
 
 A medida que el hardware se ha vuelto más potente y asequible, Linux embebido ha encontrado aplicaciones en industrias como la automoción, la domótica y la robótica.
+
+## 5. Casos de uso en la industria
+
+### Automoción
+- **Unidad de Control Electrónico (ECU)**: Controla la inyección de combustible y la ignición del motor.
+- **Sistema de frenos ABS**: Regula la presión de frenado para evitar bloqueos.
+- **Sistemas de infoentretenimiento**: Pantallas táctiles con navegación GPS y conectividad.
+- **Sensores de aparcamiento y cámaras**: Asistencia en la conducción.
+
+### Dispositivos Médicos
+- **Marcapasos**: Dispositivos implantados que regulan el ritmo cardíaco.
+- **Bombas de insulina**: Dispensan insulina automáticamente según los niveles de glucosa.
+- **Monitores de signos vitales**: Miden parámetros como presión arterial y frecuencia cardíaca.
+
+### Electrónica de Consumo
+- **Smart TVs**: Gestionan la reproducción de contenido y la conectividad.
+- **Asistentes virtuales (Alexa, Google Home)**: Responden a comandos de voz y gestionan dispositivos.
+- **Cámaras digitales**: Controlan el enfoque, la exposición y el procesamiento de imágenes.
+
+### Industria y Automatización
+- **Controladores lógicos programables (PLC)**: Gestionan procesos industriales automatizados.
+- **Robots industriales**: Ejecutan tareas repetitivas con precisión en líneas de ensamblaje.
+- **Sensores de monitoreo en fábricas**: Detectan temperatura, presión y calidad del aire.
+
+### Aeroespacial y Defensa
+- **Sistemas de control de vuelo**: Regulan la navegación y estabilidad de aeronaves.
+- **Drones**: Utilizan sensores embebidos para navegación autónoma.
+- **Sistemas de radar y sonar**: Detectan objetos y analizan el entorno.
+
+### Telecomunicaciones
+- **Routers y módems**: Gestionan la conectividad y transmisión de datos.
+- **Torres de comunicación 5G**: Optimizan la distribución de señales.
+- **Sistemas de cifrado en redes**: Protegen la transmisión de datos.
+
+### Domótica y Hogares Inteligentes
+- **Termostatos inteligentes (Nest, Ecobee)**: Regulan la temperatura del hogar.
+- **Sistemas de seguridad (cámaras y alarmas)**: Monitorean y protegen el hogar.
+- **Electrodomésticos inteligentes**: Lavadoras, refrigeradores y hornos con conectividad.
+
+## 6. Componentes de un sistema embebido
+
+1. **Bootloader**: Primer software que se ejecuta, inicializa el hardware y carga el kernel.  
+   _Ejemplos_: U-Boot, Barebox
+2. **Kernel de Linux**: Encargado de la gestión de procesos, memoria, dispositivos.  
+   _Puede ser vanilla o modificado por el fabricante._
+3. **Root Filesystem (RootFS)**: Sistema de archivos con librerías y utilidades.  
+   _Ejemplos_: BusyBox, systemd, init
+4. **Aplicaciones**: Software específico del dispositivo.  
+   _Ejemplos_: interfaz web, controladores personalizados
+
+## 7. Requisitos de hardware típicos para Linux embebido
+
+- **CPU**: 32 o 64 bits, ARM, RISC-V, MIPS
+- **RAM**: Desde 16MB hasta GBs dependiendo del caso
+- **Almacenamiento**: NAND, NOR, eMMC, microSD
+- **Periféricos**: UART, SPI, I2C, Ethernet, USB, GPIO
+- **Debug**: UART serie, JTAG
+
+## 8. Ejemplos de hardware popular
+
+- **BeagleBone Black**: AM335x ARM Cortex-A8, muy usada en educación e industria
+- **Raspberry Pi**: Popular, potente, no siempre ideal para aplicaciones industriales ni fines educativos.
+- **STM32MP1**: Dual Cortex-A7 + Cortex-M4, soporte de ST y comunidad
+- **NXP i.MX8**: Alta gama, gráficos, virtualización, automoción e IoT
+
+## 9. Desafíos en el desarrollo de Linux embebido
+
+- **Compatibilidad de hardware**: No todo el hardware tiene soporte oficial en el kernel principal de Linux. Es común tener que adaptar o desarrollar drivers, integrar soporte mediante device trees y validar periféricos específicos del hardware objetivo. Esto requiere entender la arquitectura de Linux y del SoC utilizado.
+- **Tiempo de arranque**: Muchos sistemas embebidos deben arrancar rápidamente. Para ello, se optimizan las fases de bootloader (U-Boot, Barebox), el kernel (quitando drivers y funcionalidades innecesarias) y el espacio de usuario (usando BusyBox, minimizando servicios, aplicando técnicas como systemd-analyze o bootchart).
+- **Tamaño del sistema**: En sistemas con recursos limitados, se debe minimizar el uso de almacenamiento y memoria. Esto implica crear RootFS mínimos, eliminar bibliotecas o binarios innecesarios, usar BusyBox o ToyBox, y compilar con opciones de stripping y optimización (-Os, LTO).
+- **Licenciamiento**: Linux y sus componentes están sujetos a licencias como GPL y LGPL. Es obligatorio liberar las modificaciones al kernel o drivers GPL, mantener avisos de copyright y ofrecer el código fuente al usuario si se distribuye el firmware. No cumplir puede acarrear problemas legales.
+- **Seguridad**: Muchos dispositivos embebidos son susceptibles a ataques. Es necesario implementar arranque seguro (secure boot), particiones de solo lectura, mecanismos de actualización seguras (A/B, OTA), cifrado de datos, control de acceso y actualizaciones regulares del sistema.
+- **Depuración**: En entornos embebidos puede ser difícil acceder al sistema para depurar. Se usan herramientas como JTAG, GDB remoto, strace, perf, dmesg, y técnicas como logs en RAM, LEDs para trazas, o buffers circulares. Además, se depende mucho de la simulación con QEMU en las fases iniciales.
+
 
 ## 10. Herramientas y flujos de trabajo comunes
 
@@ -145,4 +187,3 @@ Para generar estos componentes, existen varios enfoques:
 | **Yocto Project** | Plataforma modular y flexible para crear distribuciones Linux embebidas personalizadas. | Altamente configurable, soporte para múltiples arquitecturas, escalabilidad. | Curva de aprendizaje pronunciada, requiere más recursos de compilación. |
 
 Cada una de estas opciones ofrece diferentes grados de flexibilidad, complejidad y optimización, por lo que la elección depende de los requisitos del sistema embebido que se esté desarrollando.
-

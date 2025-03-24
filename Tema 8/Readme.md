@@ -1,129 +1,193 @@
-# Tema 8: Proyecto Yocto
+T# Tema 8: PROYECTO YOCTO
 
-## 8.1 Introducción al Proyecto Yocto y su Importancia en Embebidos
-El **Proyecto Yocto** es una plataforma de código abierto que permite la creación de sistemas operativos personalizados para dispositivos embebidos. Su flexibilidad y modularidad lo han convertido en una de las herramientas más utilizadas en la industria.
+## Introducción al Proyecto Yocto y su Importancia en Embebidos
 
-### Beneficios de Yocto en sistemas embebidos:
-- Generación de sistemas optimizados y personalizados.
-- Mantenimiento de un entorno reproducible y escalable.
-- Gran comunidad y soporte de la industria.
+El **Proyecto Yocto** es una herramienta de desarrollo de sistemas embebidos que permite la creación de distribuciones Linux personalizadas. Su flexibilidad y modularidad lo han convertido en un estándar en la industria embebida, facilitando la creación de sistemas optimizados para hardware específico.
 
-## 8.2 Instalación y Configuración del Entorno de Yocto
-Antes de empezar a trabajar con Yocto, es necesario instalar las dependencias y preparar el entorno de desarrollo.
+### Beneficios clave:
+- Creación de sistemas Linux optimizados y personalizados.
+- Uso de capas para gestionar configuraciones y paquetes.
+- Reproducibilidad y mantenibilidad del sistema.
+- Comunidad activa y soporte de la **Linux Foundation**.
 
-### Requisitos previos:
-- Distribución Linux (Ubuntu/Debian/Fedora).
-- Paquetes necesarios: `git`, `tar`, `wget`, `gcc`, `g++`, `make`.
+---
 
-### Pasos de instalación:
-1. Clonar el repositorio de Poky:
+## Instalación y Configuración del Entorno de Yocto
 
-   ```bash
-   git clone git://git.yoctoproject.org/poky.git
-   cd poky
-   ```
-2. Configurar el entorno:
+### Requisitos del sistema:
+- Ubuntu/Debian 64-bit (preferido) o Fedora.
+- Instalación de paquetes necesarios:
+  ```bash
+  sudo apt update && sudo apt install -y gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping
+  ```
 
-   ```bash
-   source oe-init-build-env
-   ```
+### Clonación del Proyecto Yocto:
+```bash
+git clone git://git.yoctoproject.org/poky.git -b dunfell
+cd poky
+```
 
-## 8.3 Componentes Principales: Poky, BitBake, Meta-layers
-- **Poky**: Referencia base del sistema Yocto.
+### Configuración del Entorno:
+```bash
+source oe-init-build-env
+```
+Esto crea un directorio `build` donde se configurará la construcción.
 
-- **BitBake**: Herramienta principal para la construcción de paquetes.
+---
 
-- **Meta-layers**: Capas de configuración que permiten extender las funcionalidades de Yocto.
+## Componentes Principales: Poky, BitBake, Meta-Layers
 
+### **Poky**
+Poky es la referencia de implementación en Yocto y contiene:
+- **BitBake**: Motor de construcción.
+- **Meta-poky**: Capa de referencia con configuraciones base.
+- **Meta-openembedded**: Capas adicionales con paquetes complementarios.
 
-## 8.4 Creación de Imágenes con Yocto
-Para generar una imagen con Yocto:
+### **BitBake**
+BitBake es la herramienta encargada de ejecutar las recetas de construcción.
 
+Ejemplo de construcción:
 ```bash
 bitbake core-image-minimal
 ```
-Esto generará un sistema básico optimizado para embebidos.
 
-## 8.5 Configuración y Personalización de Recetas
-Las recetas en Yocto definen cómo construir paquetes y sistemas completos. Se pueden personalizar agregando configuraciones específicas en `meta-layers`.
+### **Meta-Layers**
+Las capas (**meta-layers**) permiten modularizar el sistema. Ejemplo:
+- `meta-yocto-bsp`: Contiene BSPs de referencia.
+- `meta-openembedded`: Repositorio de paquetes adicionales.
 
-Ejemplo de receta mínima:
+---
 
+## Creación de Imágenes con Yocto
+
+Para generar una imagen básica:
 ```bash
-DESCRIPTION = "Ejemplo de receta personalizada"
+bitbake core-image-minimal
+```
+Esto generará una imagen lista para flashear en el hardware.
+
+Para agregar paquetes, edita `conf/local.conf`:
+```bash
+IMAGE_INSTALL_append = " vim git "
+```
+
+---
+
+## Configuración y Personalización de Recetas
+
+Las recetas (`.bb`) definen cómo se construyen los paquetes.
+Ejemplo de receta:
+```bitbake
+SUMMARY = "Mi aplicación personalizada"
 LICENSE = "MIT"
-SRC_URI = "file://archivo.tar.gz"
-S = "${WORKDIR}"
-do_compile() {
-    make
-}
-do_install() {
-    install -D -m 0755 binario ${D}${bindir}/binario
-}
+SRC_URI = "git://github.com/usuario/miapp.git"
+S = "${WORKDIR}/git"
+inherit autotools
 ```
 
-## 8.6 Gestión de Paquetes en Yocto (`opkg`, `rpm`, `dpkg`)
-Yocto soporta varios sistemas de gestión de paquetes:
-
-- **opkg**: Ligero y eficiente, usado en OpenEmbedded.
-
-- **rpm**: Potente y escalable, usado en distribuciones como Fedora.
-
-- **dpkg**: Compatible con Debian y sus derivados.
-
-
-Ejemplo de generación de paquetes:
-
+Ejemplo de creación de una capa personalizada:
 ```bash
-bitbake packagegroup-core-base
+bitbake-layers create-layer meta-miapp
 ```
 
-## 8.7 Construcción de un RootFS con Yocto
-Para generar un sistema de archivos raíz (RootFS):
+---
 
+## Gestión de Paquetes en Yocto (`opkg`, `rpm`, `dpkg`)
+
+Yocto soporta varios sistemas de paquetes:
+- `opkg`: Ligero, ideal para sistemas embebidos.
+- `rpm`: Robusto, usado en distribuciones como Fedora.
+- `dpkg`: Base del sistema de paquetes de Debian.
+
+Para generar paquetes en formato `ipk` (usado por `opkg`):
 ```bash
-bitbake core-image-full-cmdline
+bitbake mypackage -c package_write_ipk
 ```
-Esto generará una imagen con herramientas adicionales en `/rootfs`.
 
-## 8.8 Integración de Kernel y U-Boot en Yocto
-Se pueden integrar el Kernel y el bootloader (U-Boot) en Yocto mediante `meta-layers` personalizados.
+---
 
-Ejemplo de compilación del Kernel:
+## Construcción de un RootFS con Yocto
 
+El **RootFS** es el sistema de archivos base del sistema embebido.
+
+Para generar un `tar.gz` del rootfs:
+```bash
+bitbake core-image-minimal -c rootfs_tarball
+```
+Para inspeccionar el contenido:
+```bash
+tar -tvf tmp/deploy/images/qemux86/core-image-minimal-qemux86.tar.gz
+```
+
+---
+
+## Integración de Kernel y U-Boot en Yocto
+
+Para compilar U-Boot:
+```bash
+bitbake u-boot
+```
+Para compilar un kernel personalizado:
 ```bash
 bitbake virtual/kernel
 ```
 
-## 8.9 Creación de un BSP en Yocto
-Un **BSP (Board Support Package)** permite la compatibilidad con hardware específico. Se define en `meta-layers` y se configura mediante los archivos `machine.conf`.
+---
 
-## 8.10 Debugging y Optimización de Yocto
-Para depurar y optimizar, se pueden usar herramientas como:
+## Creación de un BSP en Yocto
 
-- **bitbake -g target** (ver dependencias de paquetes)
+Un **Board Support Package (BSP)** incluye:
+- Soporte para el kernel.
+- Drivers necesarios.
+- Configuraciones personalizadas.
 
-- **devshell** (entorno de desarrollo para debugging)
-
-- **Yocto Autobuilder** (automatización de pruebas y compilaciones)
-
-
-## 8.11 ¿Cómo Detectar Qué Necesitamos y Reducir el Tamaño Necesario?
-Para reducir el tamaño de la imagen final:
-
-- **Eliminar paquetes innecesarios** en `local.conf`.
-
-- **Usar SquashFS o compresión gzip/lz4**.
-
-- **Minimizar logs y herramientas de depuración**.
-
-
-Ejemplo de reducción de tamaño:
-
-```bash
-EXTRA_IMAGE_FEATURES = "debug-tweaks"
-IMAGE_FEATURES_remove = "package-management"
+Estructura de un BSP:
+```
+meta-mi-bsp/
+├── conf/
+│   ├── layer.conf
+├── recipes-bsp/
+│   ├── u-boot/
+│   ├── linux/
 ```
 
-## Conclusión
-El Proyecto Yocto es una herramienta clave en el desarrollo de sistemas embebidos. Su modularidad, flexibilidad y enfoque en la personalización lo hacen una opción poderosa para crear soluciones optimizadas y eficientes.
+Para agregar un BSP personalizado:
+```bash
+bitbake-layers add-layer meta-mi-bsp
+```
+
+---
+
+## Debugging y Optimización de Yocto
+
+Herramientas de debugging:
+- `bitbake -e`: Ver variables de entorno.
+- `bitbake -c devshell <paquete>`: Entrar en shell de desarrollo.
+- `bitbake -c cleansstate <paquete>`: Limpiar y reconstruir.
+
+Para optimizar el tiempo de construcción:
+- Habilitar compilación paralela:
+  ```bash
+  BB_NUMBER_THREADS = "8"
+  PARALLEL_MAKE = "-j8"
+  ```
+- Usar `sstate-cache` para reducir tiempos de recompilación.
+
+---
+
+## ¿Cómo detectar qué necesitamos y reducir el tamaño necesario?
+
+- **Eliminar paquetes innecesarios:**
+  ```bash
+  IMAGE_FEATURES_remove = "package-management"
+  ```
+- **Reducir el núcleo a lo esencial:**
+  ```bash
+  bitbake linux-yocto -c menuconfig
+  ```
+- **Usar BusyBox en lugar de GNU Coreutils.**
+- **Eliminar debug symbols:**
+  ```bash
+  INHERIT_remove = "rm_work"
+  ```
+
