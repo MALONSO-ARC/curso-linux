@@ -188,4 +188,7 @@ Para generar estos componentes, existen varios enfoques:
 | **Buildroot** | Framework que permite generar un sistema embebido con un conjunto de paquetes predefinidos. | Fácil de usar, rápido de configurar, buena documentación. | Menos flexible que Yocto, menos escalable. |
 | **Yocto Project** | Plataforma modular y flexible para crear distribuciones Linux embebidas personalizadas. | Altamente configurable, soporte para múltiples arquitecturas, escalabilidad. | Curva de aprendizaje pronunciada, requiere más recursos de compilación. |
 
+
+Nota: [Cross Linux From Scratch](https://trac.clfs.org/)
+
 Cada una de estas opciones ofrece diferentes grados de flexibilidad, complejidad y optimización, por lo que la elección depende de los requisitos del sistema embebido que se esté desarrollando.
