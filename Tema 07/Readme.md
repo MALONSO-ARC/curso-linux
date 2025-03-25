@@ -15,6 +15,7 @@ Existen varios tipos de sistemas de archivos utilizados en Linux embebido, cada 
 - **RootFS Personalizado**: Adaptado a las necesidades del sistema embebido, minimizando tamaño y optimizando rendimiento.
 
 ## 7.4 Estructura de Directorios en Linux Embebido
+[Linux Filesystem Hierarchy](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
 Los sistemas Linux embebidos siguen una estructura de directorios similar a las distribuciones estándar, pero optimizada para entornos de recursos limitados:
 - `/bin`: Binarios esenciales.
 - `/lib`: Bibliotecas compartidas.

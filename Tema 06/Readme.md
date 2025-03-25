@@ -44,7 +44,7 @@ Para compilar un kernel para un sistema embebido, se sigue este proceso:
 
 ### 1. Obtener el código fuente
 ```bash
-git clone https://github.com/torvalds/linux.git
+git clone https://github.com/beagleboard/linux.git
 cd linux
 ```
 
@@ -130,7 +130,7 @@ El soporte de hardware en el kernel de Linux se implementa mediante **drivers y 
   - **V4L2 (Video for Linux 2)** para cámaras y video.
   - **ALSA (Advanced Linux Sound Architecture)** para audio.
 
-Ejemplo de un driver de carácter:
+Ejemplo de un driver de carácter ([Ejercicio 1](./Ejemplo%201/hello_kernel.c)):
 ```c
 static int __init mi_driver_init(void) {
     printk(KERN_INFO "Mi driver cargado\n");
