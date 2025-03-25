@@ -13,19 +13,6 @@ Una **toolchain** es un conjunto de herramientas utilizadas para compilar y cons
 - **Cruzada**: Se ejecuta en una arquitectura diferente a la del software objetivo.
 
 ## Componentes de una toolchain
-- **Compilador (GCC, Clang)**
-- **Binutils (as, ld, objdump, etc.)**
-- **Bibliotecas estándar (glibc, musl, uClibc)**
-
-## Introducción al concepto de toolchain
-
-### ¿Qué es una toolchain?
-
-Una **toolchain** es un conjunto de herramientas utilizadas para compilar, enlazar y depurar software. En el contexto de sistemas embebidos, la toolchain es fundamental para traducir código fuente en ejecutables que puedan correr en la plataforma objetivo.
-
-La **toolchain cruzada** (*cross toolchain*) es el tipo más común en desarrollo embebido, ya que permite compilar código en un sistema anfitrión (*host*), generalmente una PC con Linux, y generar ejecutables para una arquitectura diferente en el sistema embebido (*target*).
-
-Los componentes principales de una toolchain son:
 
 ### Compilador
 

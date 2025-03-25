@@ -1,6 +1,6 @@
 # Tema 2: Entorno de Desarrollo en Linux Embebido
 
-## Arquitecturas de CPU en sistemas embebidos
+## 1. Arquitecturas de CPU en sistemas embebidos
 
 Los sistemas embebidos abarcan una gran variedad de aplicaciones que van desde dispositivos de consumo hasta sistemas industriales de misión crítica. La elección de la arquitectura de CPU es una decisión clave que influye en el rendimiento, consumo energético, compatibilidad con software y herramientas de desarrollo disponibles. En esta sección exploraremos las principales arquitecturas utilizadas en sistemas embebidos con Linux, sus características y consideraciones al seleccionarlas.
 
@@ -93,7 +93,7 @@ Las CPU utilizadas en sistemas embebidos pueden clasificarse según diferentes c
 - **MIPS** y **PowerPC** están en declive en términos de nuevas implementaciones.
 
 
-### Diferencias entre arquitecturas de 32 y 64 bits
+## 2. Diferencias entre arquitecturas de 32 y 64 bits
 | Característica | 32 bits | 64 bits |
 |--------------|---------|---------|
 | Espacio de direcciones | 4GB máximo | Teóricamente ilimitado |
@@ -107,13 +107,13 @@ La elección de la arquitectura de CPU en sistemas embebidos depende de múltipl
 
 Para proyectos de Linux embebido, es fundamental seleccionar una arquitectura bien soportada por el kernel y las toolchains existentes, asegurando compatibilidad a largo plazo y optimización de recursos del sistema.
 
-## Memoria en sistemas embebidos
+## 3. Memoria en sistemas embebidos: RAM, ROM,SRAM, DRAM
 
 La memoria es un recurso fundamental en sistemas embebidos, ya que determina la capacidad del sistema para ejecutar aplicaciones, almacenar datos y manejar tareas en tiempo real. A diferencia de los sistemas de propósito general, los sistemas embebidos tienen restricciones de consumo energético, costo y espacio, lo que influye en la elección y administración de la memoria.
 
-## Tipos de Memoria
+### Tipos de Memoria
 
-### RAM (Random Access Memory)
+#### RAM (Random Access Memory)
 La RAM es utilizada para la ejecución de programas y almacenamiento temporal de datos. Existen varios tipos en sistemas embebidos:
 
 - **SRAM (Static RAM)**: Memoria de acceso rápido y bajo consumo energético, pero costosa y de baja capacidad. Usada en caché y buffers de alta velocidad.
@@ -122,21 +122,13 @@ La RAM es utilizada para la ejecución de programas y almacenamiento temporal de
 - **DDR (Double Data Rate)**: Versiones DDR, DDR2, DDR3 y DDR4 ofrecen mayores velocidades y menor consumo por bit transferido.
 - **LPDDR (Low Power DDR)**: Variante de DDR optimizada para bajo consumo en dispositivos móviles y sistemas embebidos.
 
-### ROM (Read-Only Memory)
+#### ROM (Read-Only Memory)
 La ROM almacena firmware y código esencial que no cambia con frecuencia. Tipos comunes incluyen:
 
 - **Masked ROM**: Programada en fábrica y no modificable.
 - **PROM (Programmable ROM)**: Puede programarse una sola vez.
 - **EPROM (Erasable PROM)**: Puede borrarse mediante exposición a luz ultravioleta.
 - **EEPROM (Electrically Erasable PROM)**: Permite escritura y borrado eléctrico, aunque con ciclos de vida limitados.
-
-### Memoria Flash
-Almacenamiento no volátil utilizado para firmware, sistemas de archivos y datos persistentes. Existen dos tipos principales:
-
-- **NOR Flash**: Acceso aleatorio, adecuada para código ejecutable.
-- **NAND Flash**: Más densa y rápida, utilizada en almacenamiento masivo (eMMC, SD, SSD).
-
-## Administración de Memoria en Linux Embebido
 
 
 ### Sistemas de Archivos basados en RAM
@@ -178,6 +170,146 @@ Sistemas embebidos suelen usar sistemas de archivos optimizados para RAM y almac
 - Se activa con:
   ```bash
   echo 1 > /sys/module/zswap/parameters/enabled
+
+### Consideraciones en la Selección de Memoria
+
+#### Consumo Energético
+Sistemas embebidos deben balancear rendimiento y eficiencia energética:
+
+- **LPDDR y SRAM** para bajo consumo.
+- **NAND Flash** de bajo voltaje en dispositivos móviles.
+- **Desactivar caché innecesaria** para ahorrar energía en sistemas de baja potencia.
+
+#### Durabilidad y Ciclo de Vida
+Memorias Flash tienen ciclos de escritura limitados, lo que requiere:
+
+- **Algoritmos de wear leveling** para distribuir escrituras.
+- **Detección y corrección de errores (ECC)** en NAND Flash.
+
+#### Costos y Espacio
+El tipo y cantidad de memoria deben ajustarse a los costos del hardware embebido:
+
+- **SRAM es costosa pero rápida**, adecuada para pequeños buffers.
+- **DRAM es más barata**, pero consume más energía.
+- **NAND Flash ofrece más almacenamiento** a menor costo que NOR.
+
+## 4. Almacenamiento: SD, eMMC, NAND Flash, SPIFlash
+
+El subsistema de almacenamiento en sistemas embebidos es un componente esencial para la persistencia de datos, el almacenamiento del sistema operativo y la ejecución de aplicaciones. A diferencia de los sistemas de escritorio, los sistemas embebidos tienen limitaciones de espacio, rendimiento y confiabilidad que condicionan la elección del medio de almacenamiento. En esta sección abordaremos en profundidad los principales tipos de almacenamiento utilizados: SD, eMMC, NAND Flash y SPI Flash.
+
+# Tema 2 - Sección 4: Almacenamiento en Sistemas Linux Embebido
+
+## Introducción
+El subsistema de almacenamiento en sistemas embebidos es un componente esencial para la persistencia de datos, el almacenamiento del sistema operativo y la ejecución de aplicaciones. A diferencia de los sistemas de escritorio, los sistemas embebidos tienen limitaciones de espacio, rendimiento y confiabilidad que condicionan la elección del medio de almacenamiento. En esta sección abordaremos en profundidad los principales tipos de almacenamiento utilizados: **SD**, **eMMC**, **NAND Flash** y **SPI Flash**.
+
+---
+
+### Tarjetas SD (Secure Digital)
+
+#### Características generales
+- Formato removible muy popular.
+- Interfaz basada en SPI o SDIO.
+- Capacidades desde 128 MB hasta varios cientos de GB.
+- Incluyen controlador de gestión de bloques y corrección de errores.
+
+#### Ventajas
+- Bajo coste y alta disponibilidad.
+- Fácil sustitución.
+- Compatible con sistemas de desarrollo (e.g., Raspberry Pi).
+
+#### Limitaciones
+- Menor vida útil en ciclos de escritura que soluciones embebidas internas.
+- Vulnerabilidad a desconexiones intempestivas.
+
+#### Soporte en Linux
+- Administradas como dispositivos **/dev/mmcblkX**.
+- Driver: `mmcblk` y `mmc_core`.
+- Se utilizan sistemas de archivos tradicionales como ext4 o FAT.
+
+---
+
+### eMMC (embedded MultiMediaCard)
+
+#### Características generales
+- Memoria Flash NAND con controlador incorporado.
+- Soldada directamente en la PCB (no removible).
+- Interfaz compatible con MMC.
+- Capacidades típicas: 4 GB a 128 GB.
+
+#### Ventajas
+- Mayor fiabilidad que SD al estar integrada.
+- Gestión automática de wear leveling y corrección de errores.
+- Mejor rendimiento en lectura/escritura secuencial.
+
+#### Limitaciones
+- No removible. (puede ser una ventaja en algunos casos)
+- El reemplazo requiere intervención técnica.
+
+#### Soporte en Linux
+- Detectada también como `mmcblk`.
+- Se pueden crear particiones y montar como cualquier otro dispositivo de bloque.
+- Ideal para alojar el sistema de archivos raiz (`rootfs`).
+
+---
+
+### NAND Flash (Raw NAND)
+
+#### Características generales
+- Memoria Flash sin controlador de bloques.
+- Necesita gestión de wear leveling y ECC por software.
+- Dividida en bloques y páginas.
+
+#### Ventajas
+- Costo por bit muy bajo.
+- Alta densidad de almacenamiento.
+- Flexible en diseños custom.
+
+#### Limitaciones
+- Requiere gestión manual o mediante UBI/UBIFS.
+- Más propensa a errores si no se usa adecuadamente.
+- No se accede como bloque estándar (/dev/sdX), sino mediante el subsistema MTD.
+
+#### Soporte en Linux
+- Driver: subsistema MTD (Memory Technology Devices).
+- Se accede como `/dev/mtdX` o `/dev/mtdblockX`.
+- Sistemas de archivos: **UBIFS**, **JFFS2**, **YAFFS2**.
+
+---
+
+### SPI NOR Flash
+
+#### Características generales
+- Flash NOR accedida vía bus SPI.
+- Ideal para almacenamiento de firmware/bootloaders.
+- Tamaños típicos: 512 KB a 16 MB.
+
+#### Ventajas
+- Bajo consumo.
+- Alta velocidad de lectura aleatoria.
+- Excelente para código ejecutable (XIP: Execute In Place).
+
+#### Limitaciones
+- Baja densidad (no adecuado para rootfs grandes).
+- Escritura y borrado lentos.
+
+#### Soporte en Linux
+- Controlado también por el subsistema MTD.
+- Manejable mediante U-Boot para almacenar DTB, kernel, etc.
+- Compatible con herramientas como `flashcp`, `mtd-utils`.
+
+---
+
+### Comparativa general
+
+| Tipo       | Removible | Gestión Interna | Uso recomendado                  | Soporte Linux |
+|------------|------------|------------------|----------------------------------|----------------|
+| SD         | Sí        | Sí               | Prototipos, dispositivos de bajo coste | mmcblk         |
+| eMMC       | No         | Sí               | Productos finales, rootfs         | mmcblk         |
+| NAND       | No         | No                | Rootfs en diseños a medida        | mtd/mtdblock   |
+| SPI NOR    | No         | No                | Bootloaders, configuraciones      | mtd/mtdblock   |
+
+
+
 
 ### Sistemas de Ficheros para Memorias Flash en Linux
 
@@ -240,33 +372,12 @@ Dado que la memoria en sistemas embebidos es limitada, se aplican diversas estra
 - **Wear Leveling**: Distribuye escrituras equitativamente en memoria Flash para extender su vida útil.
 - **Recolección de basura en NAND**: Minimiza el impacto del borrado de bloques en memoria Flash.
 
-## Consideraciones en la Selección de Memoria
-
-### Consumo Energético
-Sistemas embebidos deben balancear rendimiento y eficiencia energética:
-
-- **LPDDR y SRAM** para bajo consumo.
-- **NAND Flash** de bajo voltaje en dispositivos móviles.
-- **Desactivar caché innecesaria** para ahorrar energía en sistemas de baja potencia.
-
-### Durabilidad y Ciclo de Vida
-Memorias Flash tienen ciclos de escritura limitados, lo que requiere:
-
-- **Algoritmos de wear leveling** para distribuir escrituras.
-- **Detección y corrección de errores (ECC)** en NAND Flash.
-
-### Costos y Espacio
-El tipo y cantidad de memoria deben ajustarse a los costos del hardware embebido:
-
-- **SRAM es costosa pero rápida**, adecuada para pequeños buffers.
-- **DRAM es más barata**, pero consume más energía.
-- **NAND Flash ofrece más almacenamiento** a menor costo que NOR.
 
 ### Conclusión
 La gestión eficiente de la memoria en sistemas embebidos es crucial para garantizar rendimiento, estabilidad y durabilidad. La elección de la memoria adecuada depende de los requisitos del sistema, incluyendo consumo energético, velocidad, costo y confiabilidad. Linux embebido ofrece múltiples mecanismos para administrar y optimizar el uso de memoria, lo que permite diseñar soluciones robustas y eficientes.
 
 
-## Interfaces de hardware en sistemas embebidos
+## 5. Interfaces de hardware: GPIO, I2C, SPI, UART, CAN,PCIe, USB
 Los sistemas embebidos se comunican con sensores y periféricos mediante diversas interfaces:
 
 - **GPIO (General Purpose Input/Output)**: Puntos de E/S programables.
@@ -277,7 +388,7 @@ Los sistemas embebidos se comunican con sensores y periféricos mediante diversa
 - **PCIe (Peripheral Component Interconnect Express)**: Conexión de alta velocidad para hardware avanzado.
 - **USB (Universal Serial Bus)**: Uso en almacenamiento, periféricos y comunicación.
 
-## Entrada y salida en sistemas embebidos
+## 6. Entrada y salida en sistemas embebidos
 Los sistemas embebidos manejan diversos dispositivos de entrada/salida:
 
 - **Sensores**: Captan información del entorno (temperatura, aceleración, etc.).
@@ -285,7 +396,7 @@ Los sistemas embebidos manejan diversos dispositivos de entrada/salida:
 - **Teclados y botones**: Entrada de usuario en sistemas interactivos.
 - **Actuadores**: Motores, servos, relés para control físico.
 
-## Tipos de buses y protocolos en Linux embebido
+## 7. Tipos de buses y protocolos en Linux embebido
 Linux embebido soporta múltiples buses de comunicación:
 
 | Bus | Características |
@@ -297,7 +408,7 @@ Linux embebido soporta múltiples buses de comunicación:
 | **PCIe** | Alta velocidad, usado en hardware avanzado. |
 | **USB** | Versátil, usado para almacenamiento y conectividad. |
 
-## Comunicación con hardware desde Linux
+## 8. Comunicación con hardware desde Linux
 Linux embebido permite interactuar con hardware mediante:
 
 - **Archivos de dispositivo (`/dev`)**: Representan periféricos como archivos.
@@ -312,7 +423,7 @@ echo 1 > /sys/class/gpio/gpio17/value  # Enciende el GPIO
 echo 0 > /sys/class/gpio/gpio17/value  # Apaga el GPIO
 ```
 
-## Herramientas de monitoreo de hardware en Linux embebido
+## 9. Herramientas de monitoreo de hardware(i2cdetect, spidev_test, gpioinfo)
 Algunas herramientas esenciales para diagnosticar y monitorear hardware:
 
 - **`i2cdetect`**: Escaneo de dispositivos I2C.
@@ -320,7 +431,7 @@ Algunas herramientas esenciales para diagnosticar y monitorear hardware:
 - **`gpioinfo`**: Información de pines GPIO.
 - **`dmesg`**: Registro de eventos del kernel.
 
-## Flujos de trabajo recomendados para desarrollo en Linux embebido
+## 10. Flujos de trabajo recomendados para desarrollo en Linux embebido
 
 El desarrollo en Linux embebido requiere un flujo de trabajo bien estructurado para optimizar el tiempo y minimizar errores en el proceso. A continuación, se presentan los pasos recomendados para un flujo de trabajo eficiente:
 
@@ -383,7 +494,4 @@ Ejemplo de script en Bash para compilar y copiar un ejecutable a un dispositivo 
 #!/bin/bash
 arm-linux-gnueabihf-gcc -o programa programa.c && scp programa usuario@192.168.1.100:/home/usuario/
 ```
-
-### Conclusión
-Siguiendo estos flujos de trabajo, el desarrollo en Linux embebido se vuelve más estructurado, eficiente y reproducible. Implementar estas prácticas facilita la depuración, reduce errores y permite una mejor integración del software en sistemas embebidos reales.
 
