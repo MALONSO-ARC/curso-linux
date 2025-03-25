@@ -1,4 +1,4 @@
-T# Tema 8: PROYECTO YOCTO
+# Tema 8: Proyecto Yocto
 
 ## Introducción al Proyecto Yocto y su Importancia en Embebidos
 

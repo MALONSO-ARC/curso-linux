@@ -1,4 +1,4 @@
-# **Board Support Package (BSP) en Linux Embebido**
+# Tema9: Board Support Package (BSP) en Linux Embebido
 
 ## **Introducción al concepto de BSP y su rol en Linux embebido**
 El **Board Support Package (BSP)** es un conjunto de software y configuraciones necesarias para ejecutar un sistema operativo en un hardware específico. En el contexto de **Linux embebido**, el BSP es crucial para garantizar la compatibilidad entre el sistema operativo y la plataforma de hardware.

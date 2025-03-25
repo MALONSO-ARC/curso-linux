@@ -1,4 +1,4 @@
-# Tema 2: Entorno de Desarrollo en Linux Embebido
+# Tema 2: Entono de desarrollo en Linux embebido
 
 ## 1. Arquitecturas de CPU en sistemas embebidos
 
