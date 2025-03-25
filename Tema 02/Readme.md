@@ -197,12 +197,6 @@ El tipo y cantidad de memoria deben ajustarse a los costos del hardware embebido
 
 El subsistema de almacenamiento en sistemas embebidos es un componente esencial para la persistencia de datos, el almacenamiento del sistema operativo y la ejecución de aplicaciones. A diferencia de los sistemas de escritorio, los sistemas embebidos tienen limitaciones de espacio, rendimiento y confiabilidad que condicionan la elección del medio de almacenamiento. En esta sección abordaremos en profundidad los principales tipos de almacenamiento utilizados: SD, eMMC, NAND Flash y SPI Flash.
 
-# Tema 2 - Sección 4: Almacenamiento en Sistemas Linux Embebido
-
-## Introducción
-El subsistema de almacenamiento en sistemas embebidos es un componente esencial para la persistencia de datos, el almacenamiento del sistema operativo y la ejecución de aplicaciones. A diferencia de los sistemas de escritorio, los sistemas embebidos tienen limitaciones de espacio, rendimiento y confiabilidad que condicionan la elección del medio de almacenamiento. En esta sección abordaremos en profundidad los principales tipos de almacenamiento utilizados: **SD**, **eMMC**, **NAND Flash** y **SPI Flash**.
-
----
 
 ### Tarjetas SD (Secure Digital)
 
