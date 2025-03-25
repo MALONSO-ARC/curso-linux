@@ -1,4 +1,4 @@
-# Tema 11: CONTROL DE MEMORIA
+# Tema 11: Control de memoria
 
 ## Introducción a la gestión de memoria en Linux
 Linux implementa un sistema de gestión de memoria altamente sofisticado, diseñado para funcionar de forma eficiente tanto en servidores de alto rendimiento como en sistemas embebidos con recursos limitados. Sus mecanismos incluyen memoria virtual, paginación, asignación dinámica y uso de swap, permitiendo una abstracción uniforme del hardware subyacente.

@@ -1,4 +1,4 @@
-# Tema 12: DEPURACIÓN EN LINUX EMBEBIDO
+# Tema 12: Depuración en Linux Embebido
 
 ## Introducción a técnicas de depuración en Linux
 La depuración en sistemas embebidos es esencial para garantizar la estabilidad y eficiencia de los dispositivos. A diferencia del entorno de escritorio, el espacio limitado, la ausencia de interfaz gráfica y el acceso restringido al hardware presentan retos adicionales.

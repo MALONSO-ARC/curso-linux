@@ -1,4 +1,4 @@
-# Tema 6: LINUX KERNEL
+# Tema 6: Linux Kernel
 
 ## ¿Qué es el Kernel de Linux y su función en un sistema embebido?
 El **Kernel de Linux** es el núcleo del sistema operativo y se encarga de gestionar los recursos de hardware y software en un sistema embebido. Sus funciones principales incluyen:
