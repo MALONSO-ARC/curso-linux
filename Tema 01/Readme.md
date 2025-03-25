@@ -1,5 +1,7 @@
 # Tema 1: Introducción a Linux Embebido
 
+![Arquitectura Linux](../assets/linux_architecture.png)
+
 ## 1. ¿Qué es un sistema embebido? Definición y características
 
 Un sistema embebido es un **sistema de computación** especializado diseñado para realizar una función específica dentro de un dispositivo más grande. A diferencia de un ordenador de propósito general, los sistemas embebidos están optimizados para tareas concretas y suelen funcionar en entornos con restricciones de recursos. Estos sistemas pueden encontrarse en una amplia gama de dispositivos, desde electrodomésticos hasta sistemas industriales y automóviles.
