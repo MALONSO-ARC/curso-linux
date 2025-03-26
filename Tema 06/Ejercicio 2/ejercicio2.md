@@ -29,9 +29,9 @@ hello_kernel/
 ├── Makefile
 └── hello_kernel.c
 ```
-[Makefile](../../assets/Makefile) 
+[Makefile](https://gitlab.com/codingalchemy/cursos-imagina-group/linux-embebido/-/raw/main/assets/Makefile) 
 
-[hello_kernel.c](../../assets/hello_kernel.c)
+[hello_kernel.c](https://gitlab.com/codingalchemy/cursos-imagina-group/linux-embebido/-/raw/main/assets/hello_kernel.c)
 
 Para crear la estructura de carpetas ejecutar:
 
