@@ -126,11 +126,11 @@ El soporte de hardware en el kernel de Linux se implementa mediante **drivers y 
 - **Drivers de bloque**: Para discos y memorias flash.
 - **Drivers de red**: Para Ethernet, WiFi, Bluetooth.
 - **Frameworks**:
-  - **I2C, SPI, GPIO, PCI** para comunicación con periféricos.
-  - **V4L2 (Video for Linux 2)** para cámaras y video.
-  - **ALSA (Advanced Linux Sound Architecture)** para audio.
+  - **I2C, SPI, GPIO, PCI** para comunicación con periféricos. [SPI](https://www.kernel.org/doc/html/v4.14/driver-api/spi.html) [I2C](https://www.kernel.org/doc/html/v4.14/driver-api/i2c.html) [GPIO](https://www.kernel.org/doc/html/v4.17/driver-api/gpio/index.html) [PCI](https://www.kernel.org/doc/html/v5.5/PCI/index.html)
+  - **V4L2 (Video for Linux 2)** para cámaras y video. [V4L2](https://www.kernel.org/doc/html/v4.9/media/uapi/v4l/v4l2.html)
+  - **ALSA (Advanced Linux Sound Architecture)** para audio. [ALSA](https://www.kernel.org/doc/html/v4.19/sound/kernel-api/index.html)
 
-Ejemplo de un driver de carácter ([Ejercicio 1](./Ejemplo%201/hello_kernel.c)):
+Ejemplo de un driver de carácter ([Ejercicio 1](./Ejercicio%201/hello_kernel.c)):
 ```c
 static int __init mi_driver_init(void) {
     printk(KERN_INFO "Mi driver cargado\n");
