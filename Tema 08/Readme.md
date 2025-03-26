@@ -23,7 +23,7 @@ El **Proyecto Yocto** es una herramienta de desarrollo de sistemas embebidos que
 
 ### Clonación del Proyecto Yocto:
 ```bash
-git clone git://git.yoctoproject.org/poky.git -b dunfell
+git clone git://git.yoctoproject.org/poky.git -b Scarthgap
 cd poky
 ```
 

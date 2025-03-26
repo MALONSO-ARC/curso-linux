@@ -6,7 +6,7 @@ Compilar U-Boot con la configuración `sandbox_defconfig` para poder ejecutar U-
 
 1. Clonar U-Boot:
 ```bash
-git clone https://source.denx.de/u-boot/u-boot.git
+git clone https://openbeagle.org/beagleboard/u-boot.git
 cd u-boot
 ```
 

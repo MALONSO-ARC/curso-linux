@@ -55,6 +55,8 @@ dd if=MLO of=/dev/sdX bs=512 seek=1
 dd if=u-boot.img of=/dev/sdX bs=512 seek=2
 ```
 
+**Nota:** Ver manual de rerencia del SoC ([am335x_reference_manual](../assets/am335x_reference_manual.pdf))
+
 ## Variables de entorno y configuración en U-Boot
 Las variables de entorno en U-Boot se almacenan en memoria Flash y pueden ser editadas para personalizar el arranque.
 
