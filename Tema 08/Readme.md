@@ -2,15 +2,69 @@
 
 ## Introducción al Proyecto Yocto y su Importancia en Embebidos
 
-El **Proyecto Yocto** es una herramienta de desarrollo de sistemas embebidos que permite la creación de distribuciones Linux personalizadas. Su flexibilidad y modularidad lo han convertido en un estándar en la industria embebida, facilitando la creación de sistemas optimizados para hardware específico.
+El **Proyecto Yocto** es una iniciativa liderada por la **Linux Foundation** que proporciona un conjunto de herramientas para crear distribuciones Linux personalizadas, especialmente para dispositivos embebidos. A diferencia de una distribución predefinida como Ubuntu o Debian, Yocto permite construir desde cero un sistema ajustado exactamente al hardware y las necesidades del proyecto.
 
-### Beneficios clave:
-- Creación de sistemas Linux optimizados y personalizados.
-- Uso de capas para gestionar configuraciones y paquetes.
-- Reproducibilidad y mantenibilidad del sistema.
-- Comunidad activa y soporte de la **Linux Foundation**.
+Su arquitectura modular, basada en capas y recetas, permite definir qué software se compila, qué configuración se aplica y cómo se organiza el sistema final.
 
 ---
+
+## Beneficios Clave
+
+- **Personalización total** del sistema operativo.
+- **Compatibilidad con múltiples arquitecturas** (ARM, x86, MIPS...)
+- **Mantenibilidad y escalabilidad** a largo plazo.
+- **Reproducibilidad** del build gracias a su sistema de recipes y capas.
+- Uso de **capas** (`layers`) para aislar configuraciones, recetas y BSPs.
+- Ampliamente adoptado por la industria y respaldado por la comunidad **OpenEmbedded**.
+
+---
+
+## Ecosistema de Yocto: Componentes principales
+
+El Proyecto Yocto no es una herramienta única, sino un conjunto de herramientas y repositorios integrados que permiten construir el sistema completo:
+
+### Diagrama de componentes principales:
+
+![Arquitectura Yocto](../assets/YP-flow-diagram.png)
+
+### Descripción de componentes:
+
+#### ✅ Poky
+Es la referencia oficial de distribución Yocto. Incluye BitBake, recetas básicas, configuraciones y capas base (como `meta`, `meta-poky`, `meta-yocto-bsp`).
+
+#### ✅ BitBake
+Motor de construcción similar a `make`, pero basado en recetas. Lee archivos `.bb` y `.bbappend` para definir cómo construir paquetes.
+
+#### ✅ OpenEmbedded
+Es la comunidad que mantiene muchas de las recetas que Yocto usa. El layer `meta-openembedded` contiene miles de paquetes adicionales y es mantenido por la comunidad.
+
+#### ✅ Capas (layers)
+Permiten modularizar el sistema. Una capa puede contener:
+- Recetas (`recipes-*/*.bb`)
+- Configuraciones (`conf/layer.conf`)
+- Archivos de soporte para plataformas (BSPs)
+
+#### ✅ BSP (Board Support Package)
+Conjunto de configuraciones, parches y recetas específicas para una plataforma de hardware (ej: `meta-beaglebone`, `meta-raspberrypi`).
+
+---
+
+## Ejemplo de estructura típica en un proyecto Yocto
+
+```plaintext
+meta-miempresa/        # Tu capa personalizada
+meta-openembedded/     # Paquetes adicionales
+poky/
+├── bitbake/               # Motor de construcción
+├── meta/                  # Capas base del sistema
+├── meta-poky/             # Configuración de referencia
+├── meta-yocto-bsp/        # BSPs de referencia
+└── build/                 # Carpeta generada con bitbake
+```
+## Recursos adicionales
+
+- [https://www.yoctoproject.org](https://www.yoctoproject.org)
+
 
 ## Instalación y Configuración del Entorno de Yocto
 
