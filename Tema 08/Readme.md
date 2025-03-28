@@ -148,17 +148,99 @@ bitbake-layers create-layer meta-miapp
 
 ## Gestión de Paquetes en Yocto (`opkg`, `rpm`, `dpkg`)
 
-Yocto soporta varios sistemas de paquetes:
-- `opkg`: Ligero, ideal para sistemas embebidos.
-- `rpm`: Robusto, usado en distribuciones como Fedora.
-- `dpkg`: Base del sistema de paquetes de Debian.
 
-Para generar paquetes en formato `ipk` (usado por `opkg`):
+### 1. Tipos de sistemas de paquetes soportados
+
+#### 🧩 `opkg`
+- Ligero y optimizado para sistemas embebidos.
+- Usado por defecto en configuraciones como `core-image-minimal`.
+- Soporta repositorios locales y remotos.
+
+#### 📦 `rpm`
+- Usado en distribuciones como Red Hat, Fedora, CentOS.
+- Ofrece una potente gestión de dependencias y firmas.
+- Adecuado para sistemas embebidos más complejos.
+
+#### 📦 `dpkg`
+- Sistema de paquetes base de Debian/Ubuntu.
+- Compatible con herramientas como `apt`, `dpkg`, `apt-get` (cuando se configura).
+
+---
+
+### 2. Seleccionar el tipo de paquetes en Yocto
+
+El tipo de sistema de paquetes se define en `local.conf`:
+
 ```bash
-bitbake mypackage -c package_write_ipk
+PACKAGE_CLASSES ?= "package_ipk"
+```
+
+Opciones posibles:
+- `package_ipk`
+- `package_rpm`
+- `package_deb`
+
+Puedes combinar varios tipos si lo deseas:
+
+```bash
+PACKAGE_CLASSES ?= "package_ipk package_deb"
+```
+
+> Nota: Cambiar el tipo de paquete requiere limpiar el build anterior (`bitbake -c cleansstate <imagen>`).
+
+---
+
+### 3. Generar paquetes manualmente
+
+Para generar un paquete `.ipk`, `.rpm` o `.deb` de una receta:
+
+```bash
+bitbake <nombre-paquete> -c package_write_ipk
+```
+
+O para `.rpm`:
+```bash
+bitbake <nombre-paquete> -c package_write_rpm
+```
+
+O para `.deb`:
+```bash
+bitbake <nombre-paquete> -c package_write_deb
+```
+
+Los paquetes generados se encuentran en:
+
+```bash
+tmp/deploy/ipk/
+tmp/deploy/rpm/
+tmp/deploy/deb/
 ```
 
 ---
+
+### 4. Usar `opkg` en el sistema objetivo
+
+Si tu imagen tiene `opkg`, puedes instalar paquetes directamente desde la terminal del sistema embebido:
+
+```bash
+opkg update
+opkg install hello
+```
+
+Puedes crear tu propio feed local y configurar `/etc/opkg/*.conf` para apuntar a él.
+
+---
+
+### 5. Incluir un sistema de paquetes en tu imagen
+
+Edita tu receta de imagen personalizada:
+
+```bitbake
+IMAGE_FEATURES += "package-management"
+```
+
+Esto incluirá herramientas como `opkg` en el rootfs para poder instalar paquetes en tiempo de ejecución.
+
 
 ## Construcción de un RootFS con Yocto
 
@@ -231,17 +313,112 @@ Para optimizar el tiempo de construcción:
 
 ## ¿Cómo detectar qué necesitamos y reducir el tamaño necesario?
 
-- **Eliminar paquetes innecesarios:**
-  ```bash
-  IMAGE_FEATURES_remove = "package-management"
-  ```
-- **Reducir el núcleo a lo esencial:**
-  ```bash
-  bitbake linux-yocto -c menuconfig
-  ```
-- **Usar BusyBox en lugar de GNU Coreutils.**
-- **Eliminar debug symbols:**
-  ```bash
-  INHERIT_remove = "rm_work"
-  ```
+Optimizar el tamaño de la imagen generada en Yocto es fundamental en sistemas embebidos con recursos limitados. A continuación se explican diferentes estrategias para reducir el tamaño del sistema.
+
+---
+
+### 1. Eliminar paquetes innecesarios
+
+Muchos paquetes se incluyen por defecto debido a `IMAGE_FEATURES`. Para evitarlo:
+
+```bitbake
+IMAGE_FEATURES:remove = "package-management"
+```
+
+Esto eliminará gestores de paquetes como `opkg`, `apt`, `dpkg` del rootfs, que no son necesarios en sistemas que no realizarán instalaciones en runtime.
+
+Adicionalmente puedes controlar los paquetes directamente:
+
+```bitbake
+IMAGE_INSTALL:remove = "nano htop gdb"
+```
+
+---
+
+### 2. Reducir el núcleo a lo esencial
+
+Si usas `linux-yocto`, puedes personalizar el kernel con:
+
+```bash
+bitbake linux-yocto -c menuconfig
+```
+
+Esto abre una interfaz de configuración donde puedes deshabilitar:
+- Drivers innecesarios
+- Sistemas de archivos no usados
+- Funcionalidades de red o seguridad no requeridas
+
+Luego guarda y exporta tu configuración con:
+```bash
+bitbake linux-yocto -c savedefconfig
+```
+
+Y asegúrela usando un fragmento en tu BSP (`defconfig` o `cfg`).
+
+---
+
+### 3. Usar BusyBox en lugar de GNU Coreutils
+
+BusyBox combina muchas herramientas UNIX en un solo binario y es mucho más pequeño que las versiones completas de `coreutils`, `util-linux`, etc.
+
+Para usar BusyBox (ya suele venir por defecto en `core-image-minimal`), asegúrate de que `coreutils` no esté en tu imagen:
+
+```bitbake
+IMAGE_INSTALL:remove = "coreutils"
+```
+
+Y si es necesario personaliza BusyBox con:
+
+```bash
+bitbake busybox -c menuconfig
+```
+
+---
+
+### 4. Eliminar símbolos de depuración
+
+Asegúrate de **no incluir** información de debugging si no la necesitas:
+
+```bitbake
+INHERIT:remove = "rm_work"
+INHERIT:remove = "buildstats"
+DEBUG_BUILD = "0"
+```
+
+Adicionalmente, puedes usar:
+
+```bitbake
+INHERIT += "rm_work"
+```
+
+Esto eliminará los archivos temporales tras compilar, reduciendo el espacio en disco usado en el host (no el rootfs).
+
+Para eliminar los paquetes `-dbg`:
+
+```bitbake
+PACKAGE_DEBUG_SPLIT_STYLE = "debug-file-directory"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+```
+
+---
+
+### 5. Detectar las recetas que se compilan para una imagen
+
+Para saber qué recetas están siendo incluidas en una imagen (y potencialmente eliminarlas):
+
+Ejecuta:
+
+```bash
+bitbake <nombre-imagen> -g
+```
+
+Esto generará archivos de dependencia en tu directorio actual:
+
+- `pn-buildlist` → lista exacta de recetas que se van a construir
+- `task-depends.dot` y `package-depends.dot` → gráficas de dependencias (puedes visualizarlas con Graphviz)
+
+Puedes abrir `pn-buildlist` y revisar todas las recetas para decidir cuáles puedes eliminar o reemplazar con opciones más ligeras.
+
+
+
 
