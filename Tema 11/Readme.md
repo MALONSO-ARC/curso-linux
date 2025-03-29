@@ -1,38 +1,97 @@
-# Tema 11: Control de memoria
+# Tema 11: Control de Memoria en Linux Embebido
 
-## Introducción a la gestión de memoria en Linux
-Linux implementa un sistema de gestión de memoria altamente sofisticado, diseñado para funcionar de forma eficiente tanto en servidores de alto rendimiento como en sistemas embebidos con recursos limitados. Sus mecanismos incluyen memoria virtual, paginación, asignación dinámica y uso de swap, permitiendo una abstracción uniforme del hardware subyacente.
+## 1. Introducción a la Gestión de Memoria en Linux
 
-## Diferencia entre memoria física y virtual
-- **Memoria física**: corresponde a los chips de RAM presentes en el sistema.
-- **Memoria virtual**: es un espacio de direcciones abstracto proporcionado a cada proceso, que puede exceder el tamaño de la memoria física disponible.
+La gestión de memoria es una de las funciones más críticas del sistema operativo Linux, especialmente en entornos embebidos donde los recursos son limitados. Linux implementa un sistema de memoria virtual sofisticado que abstrae el hardware físico subyacente y permite una administración eficiente de la memoria.
 
-Linux traduce direcciones virtuales a físicas mediante tablas de páginas mantenidas por la Unidad de Gestión de Memoria (MMU).
+Las principales características del sistema de memoria en Linux incluyen:
+- Soporte para **memoria virtual**, que permite a los procesos tener la ilusión de contar con una memoria contigua y mayor que la física disponible.
+- **Paginación por demanda**, que reduce el uso innecesario de memoria cargando páginas solo cuando se necesitan.
+- **Asignación dinámica de memoria**, que permite reservar y liberar memoria durante la ejecución del programa.
+- **Espacio de intercambio (swap)**, que extiende la memoria RAM utilizando almacenamiento secundario.
 
-## Espacios de usuario y kernel
-Linux separa dos espacios de memoria:
-- **Espacio de usuario**: donde corren las aplicaciones. Tiene acceso restringido para evitar interferencia con el sistema.
-- **Espacio kernel**: tiene acceso total al hardware. Alojado en una región protegida de la memoria virtual.
+En sistemas embebidos, es fundamental entender estos mecanismos para poder adaptar el sistema operativo a las limitaciones del hardware.
 
-## Uso de la memoria en sistemas embebidos
-Los sistemas embebidos suelen operar con recursos limitados. Por ello:
-- El tamaño del kernel y de los binarios debe optimizarse.
-- Se prefiere el uso de bibliotecas ligeras como uClibc o musl.
-- Se eliminan servicios innecesarios y se controlan estrictamente las fugas de memoria.
+---
 
-## Técnicas de optimización de memoria en Linux embebido
-- **Uso de `strip`**: elimina símbolos de depuración.
-- **Librerías compartidas**: reducen el uso de RAM.
-- **Configuración personalizada del kernel**: solo se habilitan los controladores necesarios.
-- **ZRAM y SWAP comprimido**.
-- **Revisar el mapa de memoria (`/proc/meminfo`) y estadísticas por proceso (`smem`)**.
+## 2. Diferencia entre Memoria Física y Virtual
 
-## Introducción a ZRAM y su uso en dispositivos embebidos
-**ZRAM** crea dispositivos de bloque comprimidos en RAM. Beneficios:
-- Mejora el rendimiento al reducir accesos a almacenamiento lento.
-- Aumenta la cantidad efectiva de memoria disponible.
+### Memoria Física
+Es la memoria RAM real instalada en el sistema. Su tamaño está limitado por el hardware y es compartida por el sistema operativo, drivers y aplicaciones.
 
-### Ejemplo de configuración:
+### Memoria Virtual
+Es un espacio de direcciones abstracto que el sistema operativo proporciona a cada proceso. Cada proceso cree tener acceso exclusivo a toda la memoria virtual disponible.
+
+La **MMU (Memory Management Unit)** traduce las direcciones virtuales a direcciones físicas mediante el uso de tablas de páginas. Esta traducción permite:
+- Aislamiento entre procesos.
+- Protección de memoria.
+- Uso eficiente de la memoria disponible mediante la compartición de páginas comunes (por ejemplo, bibliotecas compartidas).
+
+---
+
+## 3. Espacios de Usuario y Kernel
+
+Linux divide el espacio de memoria en:
+
+### Espacio de Usuario
+- Utilizado por las aplicaciones.
+- Acceso restringido.
+- Protegido contra acceso a memoria del kernel o de otros procesos.
+
+### Espacio del Kernel
+- Contiene el código del sistema operativo, drivers y estructuras de datos del sistema.
+- Acceso privilegiado.
+- Protegido de modificaciones por procesos de usuario.
+
+Esta separación mejora la seguridad y estabilidad del sistema.
+
+---
+
+## 4. Uso de la Memoria en Sistemas Embebidos
+
+En sistemas embebidos, la memoria es uno de los recursos más escasos. Las siguientes estrategias son comunes:
+- Reducción del tamaño del kernel mediante configuraciones personalizadas.
+- Uso de bibliotecas ligeras (uClibc, musl) en lugar de glibc.
+- Eliminación de servicios y demonios innecesarios.
+- Vigilancia activa de fugas de memoria.
+
+Es habitual utilizar herramientas como `smem`, `top`, `free` o `cat /proc/meminfo` para monitorear el uso de memoria.
+
+---
+
+## 5. Técnicas de Optimización de Memoria en Linux Embebido
+
+### Uso de `strip`
+- Elimina los símbolos de depuración de los binarios.
+- Reduce considerablemente el tamaño de ejecutables.
+
+### Librerías Compartidas
+- Permiten que varios procesos compartan la misma copia en memoria.
+- Reduce el consumo de RAM frente a binarios estáticos.
+
+### Configuración del Kernel
+- Deshabilitar drivers y subsistemas innecesarios.
+- Compilar el kernel a medida.
+
+### ZRAM y SWAP Comprimido
+- ZRAM crea un dispositivo de bloque en RAM comprimido.
+- Permite swap rápido sin acceso a almacenamiento físico.
+
+### Análisis de Memoria
+- `/proc/meminfo`: información detallada del sistema.
+- `smem`: consumo de memoria por proceso.
+- `ps`, `top`: información en tiempo real.
+
+---
+
+## 6. Introducción a ZRAM en Dispositivos Embebidos
+
+ZRAM es un módulo del kernel que permite crear dispositivos de bloque comprimidos en la RAM. Beneficios:
+- Aumenta la memoria disponible de forma efectiva.
+- Reduce accesos al almacenamiento, alargando su vida útil.
+- Mejora el rendimiento de sistemas con poca RAM.
+
+### Ejemplo de Configuración:
 ```bash
 modprobe zram
 echo lz4 > /sys/block/zram0/comp_algorithm
@@ -41,12 +100,15 @@ mkswap /dev/zram0
 swapon /dev/zram0
 ```
 
-## Configuración y uso de SWAP en entornos embebidos
-Aunque tradicionalmente evitado, el uso de swap es posible y útil si:
-- Se usa almacenamiento confiable (eMMC, NAND).
-- Se implementa compresión (zswap o zram).
+---
 
-### Creación de archivo swap:
+## 7. Configuración y Uso de SWAP en Entornos Embebidos
+
+Aunque tradicionalmente se evita el uso de swap en sistemas embebidos, hoy en día se puede considerar bajo ciertas condiciones:
+- Uso de almacenamiento fiable (eMMC, NAND).
+- Implementación de zswap o zram para compresión.
+
+### Creación de un Archivo Swap:
 ```bash
 dd if=/dev/zero of=/swapfile bs=1M count=128
 chmod 600 /swapfile
@@ -54,11 +116,21 @@ mkswap /swapfile
 swapon /swapfile
 ```
 
-## Asignación de memoria con `mmap()`, `malloc()`, `free()`
-- `malloc()` y `free()` permiten asignar y liberar bloques dinámicamente desde el heap.
-- `mmap()` permite mapear archivos o dispositivos directamente a memoria.
+El sistema puede priorizar entre múltiples dispositivos swap con `swapon -p`.
 
-### Ejemplo:
+---
+
+## 8. Asignación de Memoria con `malloc()`, `free()`, `mmap()`
+
+### `malloc()` y `free()`
+- Asignan y liberan memoria dinámicamente en el *heap* del proceso.
+- Necesarios para estructuras de datos de tamaño variable.
+
+### `mmap()`
+- Permite mapear archivos o dispositivos a memoria.
+- Muy útil para trabajar con grandes cantidades de datos sin copiarlos.
+
+### Ejemplos en C:
 ```c
 void* buffer = malloc(1024);
 if (!buffer) perror("malloc");
@@ -71,33 +143,63 @@ void* map = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
 munmap(map, size);
 ```
 
-## Depuración de problemas de memoria con `valgrind`, `strace`, `gdb`
-- **Valgrind**: detecta fugas, accesos fuera de límites, doble liberación, etc.
-  ```bash
-  valgrind --leak-check=full ./app
-  ```
-- **strace**: registra llamadas al sistema.
-  ```bash
-  strace ./app
-  ```
-- **gdb**: depurador a nivel de código fuente.
-  ```bash
-  gdb ./app
-  (gdb) run
-  ```
+---
 
-## Casos de estudio de gestión de memoria en sistemas embebidos
-1. **Router doméstico con OpenWRT**:
-   - Uso extensivo de ZRAM.
-   - SWAP comprimido para mantener servicios en RAM.
+## 9. Depuración de Problemas de Memoria
 
-2. **Dispositivo IoT con Linux y 64MB RAM**:
-   - Eliminación de servicios innecesarios.
-   - BusyBox como shell y herramientas.
-   - Kernel con configuración minimalista.
+### Valgrind
+Detecta:
+- Fugas de memoria.
+- Accesos fuera de límites.
+- Uso de memoria sin inicializar.
 
-3. **Sistemas automotrices (IVI)**:
-   - Uso de memoria compartida entre procesos para gráficos.
+```bash
+valgrind --leak-check=full ./app
+```
+
+### strace
+- Muestra llamadas al sistema.
+- Ayuda a identificar errores de asignación o acceso.
+
+```bash
+strace ./app
+```
+
+### gdb
+- Depurador interactivo.
+- Permite examinar memoria, registros, stack, etc.
+
+```bash
+gdb ./app
+(gdb) run
+```
+
+---
+
+## 10. Casos de Estudio
+
+### Caso 1: Router doméstico con OpenWRT
+- RAM limitada (32MB o 64MB).
+- Uso de ZRAM para SWAP.
+- Kernel personalizado.
+- Binarios con `strip`.
+- BusyBox para comandos.
+
+### Caso 2: Dispositivo IoT con 64MB de RAM
+- uClibc o musl como libc.
+- Eliminación de demonios innecesarios.
+- Kernel optimizado.
+- Supervisión con `smem` y `top`.
+
+### Caso 3: Sistema Automotriz IVI
+- Interfaz gráfica intensiva.
+- Memoria compartida entre procesos para buffers de video.
+- Control de fugas crítico.
+- Uso de `mmap()` para acceso eficiente a archivos multimedia.
+
+---
+
+Este tema proporciona una base para comprender y aplicar técnicas de gestión y optimización de memoria en Linux embebido, esenciales para el diseño de sistemas confiables y eficientes. para gráficos.
    - Monitorización constante de fugas.
 
 

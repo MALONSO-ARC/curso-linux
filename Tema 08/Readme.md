@@ -144,6 +144,107 @@ Ejemplo de creación de una capa personalizada:
 bitbake-layers create-layer meta-miapp
 ```
 
+
+Las recetas, pueden usarse para incluir en el rootfs:
+- Aplicaciones
+- Ficheros de configuración
+- Añadir permisos o usuarios al rootfs
+
+### Ejemplo 1: Receta dedicada para añadir un fichero de configuración
+
+#### Estructura de archivos:
+```
+meta-custom/recipes-config/my-config/my-config.bb
+meta-custom/recipes-config/my-config/
+├── my_config.conf/ # Fichero de configuración
+```
+
+##### Contenido del fichero de configuración (my_config.conf):
+```
+# CONFIG_VAR=1
+# DEBUG=true
+```
+
+###### my-config.bb
+```
+DESCRIPTION = "Configuración personalizada para el sistema"
+LICENSE = "CLOSED"
+SRC_URI += "file://my_config.conf"
+
+S = "${WORKDIR}"
+
+do_install() {
+    install -d ${D}${sysconfdir}/myapp
+    install -m 0644 ${WORKDIR}/my_config.conf ${D}${sysconfdir}/myapp/my_config.conf
+}
+
+FILES:${PN} += "${sysconfdir}/myapp/my_config.conf"
+```
+
+### Ejemplo 2: Modificar receta de componente SW para incluir configuración
+
+```
+meta-custom/recipes-opencv/opencv-app/opencv-app.bb
+meta-custom/recipes-opencv/opencv-app/files
+├── my_app.conf # Fichero de configuración
+```
+
+#### Contenido del fichero de configuración (my_app.conf):
+```
+# ---
+# [settings]
+# camera_id=0
+# resolution=640x480
+# ---
+```
+
+#### opencv-app.bb
+```
+DESCRIPTION = "Aplicación que usa OpenCV"
+LICENSE = "MIT"
+SRC_URI = "git://git.example.com/opencv_app.git;branch=main \
+           file://my_app.conf"
+
+S = "${WORKDIR}/git"
+
+inherit cmake
+
+do_install:append() {
+    install -d ${D}${sysconfdir}/opencv
+    install -m 0644 ${WORKDIR}/my_app.conf ${D}${sysconfdir}/opencv/my_app.conf
+}
+
+FILES:${PN} += "${sysconfdir}/opencv/my_app.conf"
+```
+
+### Ejemplo 3: Añadir un usuario y asignarle password, grupos y permisos.
+
+```
+# user1.bb
+SUMMARY = "Añade el usuario 'user1' al sistema con contraseña y grupo"
+DESCRIPTION = "Crea el usuario 'user1', le asigna la contraseña 'temp_password' y lo añade al grupo 'users'"
+LICENSE = "MIT"
+
+inherit useradd
+
+# Define el usuario y grupo
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM:${PN} = "-u 1001 -G users -p '\$6\$abcd\$9P31ZCIEYlMhzLRAx5Kv2rUPiZ0OWs7tG63PCvvbMuGQbxR2p5Z4DLb7IYPq95uwOjMQTxJIEQesfCZ2vUzR1/' user1"
+
+# NOTA: La contraseña anterior es 'temp_password' en formato SHA-512 (se genera con `mkpasswd -m sha-512` o `openssl passwd -6`)
+
+# Este paquete no instala archivos, solo crea el usuario en el sistema
+do_install[noexec] = "1"
+```
+
+Para generar la contraseña en formato SHA-512:
+```
+mkpasswd -m sha-512 temp_password
+# o alternativamente:
+openssl passwd -6 temp_password
+```
+
+
 ---
 
 ## Gestión de Paquetes en Yocto (`opkg`, `rpm`, `dpkg`)
@@ -419,6 +520,16 @@ Esto generará archivos de dependencia en tu directorio actual:
 
 Puedes abrir `pn-buildlist` y revisar todas las recetas para decidir cuáles puedes eliminar o reemplazar con opciones más ligeras.
 
+
+#### Eliminar del build las recetas no usadas
+
+Tras auditar nuestra imagen y eliminar recetas que no queremos incluir en nuestra imagen, podemos tener la situación de que haya recetas compiladas (junto con su código descargado) que ya no estamos incluyendo en nuestra imagen. Para reducir el espacio utilizado en nuestra máquina de build, podemos limpiar de la cache esos paquetes.
+
+Para ello, no hay un comando concreto de bitbake, si no que tenemos que:
+
+- Obtener un listado de recetas que están actualmente construidas
+- Obtener un listado de recetas que se incluyen en nuestra imagen
+- Eliminar todas las recetas que están compiladas pero ya no forman parte de nuestra imagen.
 
 
 
