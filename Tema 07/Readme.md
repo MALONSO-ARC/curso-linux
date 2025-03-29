@@ -141,11 +141,6 @@ qemu-system-arm -M vexpress-a9 -m 512M \
 
 
 ## 7.6 Métodos de Carga del RootFS en Sistemas Embebidos
----
-
-# Tema 7 - Sistemas de Archivos Root (RootFS)
-
-## 7.6 Métodos de Carga del RootFS en Sistemas Embebidos
 
 En sistemas embebidos, el sistema de archivos root (rootfs) puede cargarse de diversas formas, dependiendo del hardware, el gestor de arranque y las necesidades del sistema.
 
