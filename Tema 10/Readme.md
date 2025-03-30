@@ -582,39 +582,225 @@ Estos mecanismos son fundamentales para garantizar la **consistencia** y **estab
 
 ## 6. Prioridades de procesos y scheduling en Linux
 
-En sistemas embebidos, el **scheduler** determina el orden de ejecución de procesos.
+En sistemas embebidos con Linux, el planificador de tareas (**scheduler**) es responsable de decidir qué proceso o hilo debe ejecutarse en cada momento. La correcta configuración de prioridades y el tipo de planificación es crucial para garantizar la **reactividad**, **rendimiento** y **estabilidad** del sistema.
 
-### **Cambiar prioridad con `nice` y `renice`**
+---
+
+### 6.1 El scheduler de Linux
+
+Linux usa un planificador **completamente justo** (CFS, *Completely Fair Scheduler*) por defecto, que prioriza la equidad entre procesos. Sin embargo, también soporta planificadores **en tiempo real**, como:
+
+- `SCHED_FIFO` (First-In, First-Out)
+- `SCHED_RR` (Round Robin)
+- `SCHED_DEADLINE` (basado en deadlines reales)
+
+Cada proceso o hilo tiene:
+- **Una prioridad estándar (nice)**: va de **-20** (máxima prioridad) a **+19** (mínima prioridad).
+- **Una prioridad en tiempo real** (si está bajo un scheduler RT): de **1 a 99**, donde **99 es la más alta**.
+
+---
+
+### 6.2 Prioridad estándar con `nice`
+
+El valor `nice` afecta la prioridad relativa bajo el planificador CFS. Cuanto más bajo el valor, más prioridad tiene el proceso.
+
+#### Lanzar un proceso con prioridad baja:
 ```bash
 nice -n 10 ./mi_programa
-renice -n -5 -p 1234
 ```
 
-### **Ver prioridad de procesos**
+#### Cambiar la prioridad de un proceso en ejecución:
+```bash
+renice -n -5 -p 1234  # PID 1234 pasa a tener nice -5
+```
+
+> Nota: para usar valores negativos se requieren permisos de superusuario.
+
+#### Ver prioridades con `top` o `htop`:
 ```bash
 top -o %PR
 ```
+En la columna **NI** se muestra el valor de `nice`.
+
+---
+
+### 6.3 Planificación en tiempo real
+
+Los procesos que requieren determinismo o tiempos de respuesta garantizados pueden usar **planificación en tiempo real**.
+
+#### Tipos de scheduling:
+- `SCHED_FIFO`: cola fija sin expiración de tiempo. El proceso sigue ejecutándose hasta que bloquea o cede la CPU.
+- `SCHED_RR`: similar a FIFO, pero con **quantum** fijo para rotar entre procesos de igual prioridad.
+- `SCHED_DEADLINE`: permite establecer plazos y requisitos temporales (uso avanzado).
+
+#### Asignar un scheduler en tiempo real:
+```c
+#include <sched.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    struct sched_param param;
+    param.sched_priority = 80; // Prioridad entre 1 y 99
+
+    if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        perror("sched_setscheduler");
+        return 1;
+    }
+    while (1) {
+        // Tarea en bucle infinito
+    }
+    return 0;
+}
+```
+
+> Es necesario ejecutar como **root** para cambiar a un scheduler en tiempo real.
+
+#### Establecer con `chrt` (en consola):
+```bash
+sudo chrt -f 80 ./mi_programa        # FIFO con prioridad 80
+sudo chrt -r 50 ./mi_programa        # Round-robin con prioridad 50
+```
+
+#### Consultar tipo de scheduler de un proceso:
+```bash
+chrt -p <PID>
+```
+
+---
+
+### 6.4 Comparación de prioridades
+
+| Tipo de prioridad     | Rango      | Scheduler       | Necesita root |
+|------------------------|------------|------------------|----------------|
+| nice (estándar)        | -20 a +19  | CFS               | No (excepto negativos) |
+| tiempo real (RT)       | 1 a 99     | FIFO / RR / DEADLINE | Sí            |
+
+---
+
+### 6.5 Consideraciones en sistemas embebidos
+
+- Para tareas que deben ejecutarse con **baja latencia o sin interrupción**, se recomienda usar `SCHED_FIFO` o `SCHED_RR`.
+- Evita abusar de prioridades altas: un proceso con prioridad 99 puede bloquear todo el sistema si no cede la CPU.
+- Las prioridades en tiempo real no se mezclan con las prioridades `nice`.
+- Usa `nice` para reducir el impacto de tareas no críticas (como logging o actualizaciones).
+
 
 ---
 
 ## 7. Ejecución en background y demonios
 
-Ejecutar un proceso en **background**:
+En sistemas Linux, y especialmente en entornos embebidos, es común querer ejecutar procesos que funcionen en segundo plano. Esto se puede lograr mediante la ejecución en **background** o mediante la creación de **demonios (daemons)**.
+
+---
+
+### 7.1 Ejecución en background
+
+Ejecutar un proceso en segundo plano significa que la terminal no queda bloqueada por la ejecución de ese programa.
+
+#### Forma básica:
 ```bash
 ./mi_programa &
 ```
+Esto inicia `mi_programa` en background, liberando la consola.
 
-Ejemplo de un **demonio**:
+#### Ver procesos en background:
+```bash
+jobs
+```
+
+#### Traer un proceso al foreground:
+```bash
+fg %1
+```
+
+#### Detener y enviar a background:
+- `Ctrl+Z` pausa el proceso actual
+- `bg` lo reanuda en segundo plano
+
+#### Asignar prioridad a un proceso en background:
+```bash
+nice -n 10 ./mi_programa &
+```
+
+---
+
+### 7.2 Creación de un demonio (daemon)
+
+Un **demonio** es un proceso que:
+- Se ejecuta en segundo plano sin asociarse a una terminal
+- Típicamente inicia junto al sistema
+- Ejecuta tareas periódicas o espera eventos (como servidores)
+
+#### Pasos para crear un daemon correctamente:
+1. **Crear un nuevo proceso con `fork()`** y terminar el proceso padre
+2. **Llamar a `setsid()`** para iniciar una nueva sesión (desasociarse de la terminal)
+3. **Establecer el directorio de trabajo (opcional)** con `chdir()`
+4. **Cambiar la máscara de permisos con `umask(0)`**
+5. **Cerrar descriptores de archivo estándar (`stdin`, `stdout`, `stderr`)**
+6. **Entrar en un bucle principal de trabajo**
+
+#### Ejemplo mínimo de daemon:
 ```c
-pid_t pid = fork();
-if (pid > 0) exit(0);
-setsid();
-chdir("/");
-umask(0);
-while (1) {
-    sleep(1);
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    pid_t pid = fork();
+    if (pid < 0) exit(EXIT_FAILURE);
+    if (pid > 0) exit(EXIT_SUCCESS); // Terminar padre
+
+    setsid(); // Nueva sesión
+    chdir("/");
+    umask(0);
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    // Abrir log opcionalmente
+    int log = open("/tmp/daemon.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
+
+    while (1) {
+        dprintf(log, "Daemon activo...\n");
+        sleep(5);
+    }
+
+    close(log);
+    return 0;
 }
 ```
+
+#### Compilación y prueba:
+```bash
+gcc daemon.c -o mi_daemon
+./mi_daemon &
+```
+
+Verifica que el archivo `/tmp/daemon.log` se esté escribiendo.
+
+---
+
+### 7.3 Diferencias clave entre background y daemon
+
+| Característica         | Proceso en background | Daemon               |
+|------------------------|------------------------|----------------------|
+| Asociado a terminal    | Sí                    | No                   |
+| Sobrevive logout       | No                     | Sí                  |
+| Se lanza manualmente   | Generalmente sí       | Suele iniciarse al boot |
+| Uso típico             | Scripts o pruebas      | Servicios permanentes |
+| Output a terminal      | Sí                    | No (redireccionado o log) |
+
+---
+
+### 7.4 Consideraciones en sistemas embebidos
+- Los demonios son ideales para tareas como: servidores de red, monitoreo de sensores, gestores de eventos o tareas periódicas.
+- En sistemas embebidos sin `systemd`, los demonios pueden ser lanzados desde scripts de arranque (`rc.local`, init.d o buildroot scripts).
+- Es importante manejar **señales (signals)** adecuadamente para permitir que el daemon termine limpiamente.
 
 ---
 

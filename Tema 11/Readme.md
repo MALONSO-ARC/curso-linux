@@ -45,6 +45,33 @@ Linux divide el espacio de memoria en:
 
 Esta separación mejora la seguridad y estabilidad del sistema.
 
+### Mecanismos de Comunicación entre Espacios
+
+Aunque los espacios de usuario y kernel están separados, existen mecanismos controlados que permiten compartir o intercambiar datos entre ambos:
+
+#### 1. `copy_from_user()` y `copy_to_user()`
+Estas funciones son usadas dentro de controladores del kernel (drivers) para transferir datos de forma segura entre el espacio de usuario y el kernel.
+
+Por ejemplo, un dispositivo implementado con `ioctl` puede utilizar estas funciones para leer o escribir estructuras de datos:
+```c
+if (copy_from_user(&kdata, udata, sizeof(kdata))) {
+    return -EFAULT;
+}
+```
+
+Estas funciones protegen contra accesos no válidos, verificando que las direcciones pasadas por el usuario sean accesibles y válidas.
+
+#### 2. Acceso directo mediante `/dev/mem`
+El archivo especial `/dev/mem` permite a los procesos en espacio de usuario acceder directamente al espacio de direcciones físicas, útil en sistemas embebidos para interactuar con hardware.
+
+Ejemplo para mapear una región física a espacio de usuario:
+```c
+int fd = open("/dev/mem", O_RDWR);
+void *map = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, phys_addr);
+```
+
+> ⚠️ Nota: El uso de `/dev/mem` implica riesgos de seguridad y estabilidad. Debe ser restringido a propósitos muy controlados.
+
 ---
 
 ## 4. Uso de la Memoria en Sistemas Embebidos
@@ -196,10 +223,4 @@ gdb ./app
 - Memoria compartida entre procesos para buffers de video.
 - Control de fugas crítico.
 - Uso de `mmap()` para acceso eficiente a archivos multimedia.
-
----
-
-Este tema proporciona una base para comprender y aplicar técnicas de gestión y optimización de memoria en Linux embebido, esenciales para el diseño de sistemas confiables y eficientes. para gráficos.
-   - Monitorización constante de fugas.
-
 

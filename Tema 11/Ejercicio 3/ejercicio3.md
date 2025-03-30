@@ -2,6 +2,8 @@
 
 **Objetivo:** Comparar swap en almacenamiento persistente vs swap en RAM comprimida.
 
+**Requisitos Previos**  Instalar zram-tools ejecutando el comando ```sudo apt install zram-tools```
+
 **Pasos:**
 1. Crea un archivo swap de 256MB:
    ```bash
