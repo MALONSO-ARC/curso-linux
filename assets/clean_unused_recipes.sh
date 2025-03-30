@@ -11,14 +11,15 @@ if [ ! -f "$INSTALLED_PKG_FILE" ]; then
     exit 1
 fi
 
-echo "📦 Listando paquetes compilados..."
-oe-pkgdata-util list-pkgs | sort > all-pkgs.txt
+echo "Listando paquetes compilados..."
+find tmp/work -mindepth 2 -maxdepth 2 -type d | awk -F'/' '{print $4}' | sort -u > all_built_recipes.txt
 
-echo "📄 Obteniendo paquetes instalados en la imagen..."
+
+echo "Obteniendo paquetes instalados en la imagen..."
 sort "$INSTALLED_PKG_FILE" > used-pkgs.txt
 
 echo "🔍 Detectando paquetes compilados pero no usados..."
-comm -23 all-pkgs.txt used-pkgs.txt > unused-pkgs.txt
+comm -23 all_built_recipes.txt used-pkgs.txt > unused-pkgs.txt
 
 echo "🧹 Limpiando cache (sstate y workdir) de paquetes no usados..."
 while read -r pkg; do
