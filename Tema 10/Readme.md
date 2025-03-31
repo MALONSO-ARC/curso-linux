@@ -802,6 +802,19 @@ Verifica que el archivo `/tmp/daemon.log` se esté escribiendo.
 - En sistemas embebidos sin `systemd`, los demonios pueden ser lanzados desde scripts de arranque (`rc.local`, init.d o buildroot scripts).
 - Es importante manejar **señales (signals)** adecuadamente para permitir que el daemon termine limpiamente.
 
+
+#### Tabla resumen de los runlevels en SystemD
+| Runlevel | systemd Target         | Descripción                                      |
+|----------|------------------------|--------------------------------------------------|
+| 0        | `poweroff.target`      | Apagar el sistema                               |
+| 1        | `rescue.target`        | Modo de rescate (modo usuario único)            |
+| 2        | `multi-user.target`    | Modo multiusuario sin red (varía según distro)  |
+| 3        | `multi-user.target`    | Modo multiusuario con red, sin entorno gráfico  |
+| 4        | (no usado / custom)    | Reservado para uso personalizado                |
+| 5        | `graphical.target`     | Modo gráfico (incluye multiusuario y X)         |
+| 6        | `reboot.target`        | Reiniciar el sistema                            |
+
+
 ---
 
 ## 8. Debugging de procesos y detección de bloqueos

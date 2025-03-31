@@ -9,10 +9,10 @@ La seguridad en sistemas embebidos es fundamental, especialmente en sectores com
 Los sistemas embebidos presentan desafíos de seguridad particulares debido a sus restricciones de hardware, su ciclo de vida largo y su despliegue en entornos potencialmente hostiles.
 
 **Principales características de seguridad:**
-- Confidencialidad: proteger los datos del usuario.
-- Integridad: asegurar que los datos y firmware no han sido modificados.
-- Autenticidad: verificar la identidad de firmware, usuarios o servicios.
-- Disponibilidad: garantizar que el sistema está accesible y operativo.
+- **Confidencialidad:** proteger los datos del usuario.
+- **Integridad:** asegurar que los datos y firmware no han sido modificados.
+- **Autenticidad:** verificar la identidad de firmware, usuarios o servicios.
+- **Disponibilidad:** garantizar que el sistema está accesible y operativo.
 
 **Ejemplo:** Una cámara IP conectada a internet debe proteger las credenciales de acceso, evitar que su firmware sea modificado por terceros, y mantenerse operativa incluso ante ataques.
 
@@ -47,14 +47,74 @@ Antes de implementar contramedidas, es vital identificar posibles vectores de at
 U-Boot admite firma de imágenes usando **FIT (Flattened Image Tree)** con soporte de verificación RSA.
 
 **Pasos típicos:**
-1. Crear claves RSA (openssl).
-2. Firmar el FIT con el kernel, DTB y ramdisk.
-3. Configurar U-Boot para validar firmas.
+1. Crear claves RSA:
+   ```bash
+   openssl genpkey -algorithm RSA -out devkey.key -pkeyopt rsa_keygen_bits:2048
+   openssl rsa -in devkey.key -pubout -out devkey.pub
+   ```
 
-```bash
-mkimage -f fit.its fit.itb
-openssl genrsa -out key.pem 2048
-```
+2. Crear archivo `fit.its` con descripción del kernel, initrd, dtb y firmas:
+   ```text
+    /dts-v1/;
+
+    / {
+        description = "FIT image with kernel, FDT and signature";
+        #address-cells = <1>;
+
+        images {
+            kernel@1 {
+                description = "Linux Kernel";
+                data = /incbin/("zImage");
+                type = "kernel";
+                arch = "arm";
+                os = "linux";
+                compression = "none";
+                load = <0x80008000>;
+                entry = <0x80008000>;
+                hash@1 {
+                    algo = "sha256";
+                };
+            };
+
+            fdt@1 {
+                description = "Flattened Device Tree blob";
+                data = /incbin/("vexpress-v2p-ca9.dtb");
+                type = "flat_dt";
+                arch = "arm";
+                compression = "none";
+                hash@1 {
+                    algo = "sha256";
+                };
+            };
+        };
+
+        configurations {
+            default = "conf@1";
+            conf@1 {
+                description = "Boot Linux kernel with FDT";
+                kernel = "kernel@1";
+                fdt = "fdt@1";
+                signature@1 {
+                    algo = "rsa2048";
+                    key-name-hint = "devkey";
+                    sign-images = "kernel@1", "fdt@1";
+                };
+            };
+        };
+    };
+   ```
+
+3. Firmar la imagen:
+   ```bash
+   mkimage -f fit.its fit.itb
+   ```
+
+4. Configurar U-Boot:
+   ```bash
+   env set bootfile fit.itb
+   env set verify=y
+   bootm ${loadaddr}
+   ```
 
 **Ventaja:** Impide la ejecución de firmware no autorizado.
 
@@ -78,8 +138,12 @@ openssl enc -d -aes-256-cbc -in secreto.enc -out secreto.txt
 Permite cifrado asimétrico con gestión de claves públicas/privadas.
 
 ```bash
+# Generar claves
+gpg --gen-key
+
 # Encriptar
 gpg -e -r usuario@example.com archivo.txt
+
 # Desencriptar
 gpg -d archivo.txt.gpg
 ```
@@ -106,7 +170,11 @@ strip mi_aplicacion
 upx --best binario
 ```
 
-**Nota:** Esto no reemplaza Secure Boot, pero es una capa adicional.
+**Firma del binario con `openssl`:**
+```bash
+openssl dgst -sha256 -sign priv.key -out firma.bin binario
+openssl dgst -sha256 -verify pub.key -signature firma.bin binario
+```
 
 ---
 
@@ -120,7 +188,11 @@ Las **claves criptográficas** son la base de la autenticación y el cifrado. Su
 - Cambiar claves por defecto antes del despliegue.
 
 **Ejemplo de hardware:**
-- **TPM (Trusted Platform Module)**
+- **TPM (Trusted Platform Module)** con `tpm2-tools`:
+  ```bash
+  tpm2_getrandom --hex 8
+  tpm2_createprimary -C o -g sha256 -G rsa -c primary.ctx
+  ```
 - **ATECC608A** (Microchip): almacena claves y realiza operaciones de firma/cifrado sin exponer la clave.
 
 ---
@@ -137,6 +209,9 @@ Para evitar que claves se extraigan del dispositivo:
 **Ejemplo:**
 ```bash
 cryptsetup luksFormat /dev/mmcblk0p3
+cryptsetup open /dev/mmcblk0p3 securedata
+mkfs.ext4 /dev/mapper/securedata
+mount /dev/mapper/securedata /mnt/data
 ```
 
 **Nota:** Combinar técnicas según el nivel de seguridad requerido.
@@ -152,6 +227,16 @@ cryptsetup luksFormat /dev/mmcblk0p3
 - Más complejo de configurar.
 - Requiere soporte en el kernel y espacio de usuario.
 
+**Ver políticas activas:**
+```bash
+sestatus
+``` 
+
+**Listar contextos:**
+```bash
+ls -Z /bin/ls
+```
+
 ### AppArmor
 - Más sencillo.
 - Basado en rutas de archivos.
@@ -161,6 +246,18 @@ cryptsetup luksFormat /dev/mmcblk0p3
 ```conf
 DISTRO_FEATURES_append = " apparmor"
 ```
+
+**Activar perfil:**
+```bash
+aa-enforce /etc/apparmor.d/myapp
+```
+
+Recursos:  
+[meta-security](https://layers.openembedded.org/layerindex/branch/master/layer/meta-security/)  
+[meta-selinux](https://layers.openembedded.org/layerindex/branch/master/layer/meta-selinux/)  
+[App Armor cheatsheet](../assets/apparmor.md)
+
+
 
 ---
 
@@ -172,8 +269,13 @@ DISTRO_FEATURES_append = " apparmor"
 2. **Cifrado de datos**: proteger datos en reposo.
 3. **Usuarios limitados**: evitar ejecutar como root.
 4. **Actualizaciones firmadas**: prevenir firmware malicioso.
-5. **Firewall** y control de puertos.
+5. **Firewall** y control de puertos:
+   ```bash
+   iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+   iptables -P INPUT DROP
+   ```
 6. **MAC (SELinux/AppArmor)**: restringir acceso a nivel de proceso.
+7. **Logs de auditoría y detección de intrusiones (AIDE, fail2ban)**
 
 **Ejemplo:** Un gateway IoT que usa U-Boot + Secure Boot, RootFS cifrado, políticas AppArmor y autenticación SSH con clave pública.
 
@@ -185,8 +287,31 @@ DISTRO_FEATURES_append = " apparmor"
 - Aplicar parches de seguridad regularmente.
 - Validar entradas del usuario (evitar buffer overflows).
 - Deshabilitar servicios innecesarios.
-- Habilitar logs de auditoría.
-- Usar herramientas como `checksec`, `scanelf`, `lynis`, `clamav`.
-- Simular ataques (pentesting, fuzzing) en entornos de prueba.
+- Habilitar logs de auditoría (`rsyslog`, `logrotate`).
+- Usar herramientas como:
+  - `checksec` para ver protecciones de binarios
+  - `scanelf` para detectar enlaces inseguros o funciones peligrosas
+  - `lynis` para auditoría general del sistema
+  - `clamav` para análisis de malware
 
+**Ejemplo `checksec`:**
+```bash
+checksec --file=binario
+```
+
+**Ejemplo `scanelf`:**
+```bash
+scanelf -qR /usr/bin | grep 'libc.so'
+```
+
+**Ejemplo `lynis`:**
+```bash
+lynis audit system
+```
+
+**Simulación de ataques:**
+- Usar fuzzers como `AFL` para encontrar vulnerabilidades.
+- Pentesting con `nmap`, `metasploit`, etc. en entorno de pruebas controlado.
+
+---
 

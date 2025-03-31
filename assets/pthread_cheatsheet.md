@@ -85,13 +85,67 @@ for (int i = 0; i < N; i++) {
 
 ---
 
-## Buenas prácticas
-- Usa `pthread_join` para evitar procesos zombie.
-- Protege recursos compartidos con mutex.
-- Evita variables locales que puedan dejar de existir al terminar `main()`.
-- Cuidado con el uso de variables globales compartidas.
+## Semáforos con POSIX (`semaphore.h`)
+
+### Inclusión y tipos
+```c
+#include <semaphore.h>
+sem_t sem;
+```
+
+### Inicialización
+```c
+sem_init(&sem, 0, 1); // 0 = uso entre hilos (no entre procesos)
+```
+
+### Esperar y liberar
+```c
+sem_wait(&sem);   // Decrementa y bloquea si el valor es 0
+// Sección crítica
+sem_post(&sem);   // Incrementa el semáforo
+```
+
+### Destrucción
+```c
+sem_destroy(&sem);
+```
+
+### Ejemplo completo
+```c
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+
+sem_t sem;
+
+void *func(void *arg) {
+    sem_wait(&sem);
+    printf("Hilo en sección crítica\n");
+    sem_post(&sem);
+    return NULL;
+}
+
+int main() {
+    pthread_t t1, t2;
+    sem_init(&sem, 0, 1);
+
+    pthread_create(&t1, NULL, func, NULL);
+    pthread_create(&t2, NULL, func, NULL);
+
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    sem_destroy(&sem);
+    return 0;
+}
+```
+
+**Ventajas:** útiles para controlar acceso entre múltiples hilos cuando solo cierta cantidad debe entrar en una sección crítica.
 
 ---
 
-
-
+## Buenas prácticas
+- Usa `pthread_join` para evitar procesos zombie.
+- Protege recursos compartidos con mutex o semáforos.
+- Evita variables locales que puedan dejar de existir al terminar `main()`.
+- Cuidado con el uso de variables globales compartidas.

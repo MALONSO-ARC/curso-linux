@@ -58,6 +58,8 @@ if (copy_from_user(&kdata, udata, sizeof(kdata))) {
     return -EFAULT;
 }
 ```
+**Nota** Para ver un ejemplo completo de IOCTL (desde el lado del kernel y desde el lado del userspace) mira [AQUI](../assets/ioctl_example.md)
+
 
 Estas funciones protegen contra accesos no válidos, verificando que las direcciones pasadas por el usuario sean accesibles y válidas.
 
@@ -83,6 +85,16 @@ En sistemas embebidos, la memoria es uno de los recursos más escasos. Las sigui
 - Vigilancia activa de fugas de memoria.
 
 Es habitual utilizar herramientas como `smem`, `top`, `free` o `cat /proc/meminfo` para monitorear el uso de memoria.
+
+
+En algunas de las aplicaciones para monitorizar la memoria aparecen algunos conceptos como RSS, PSS o USS. En la siguiente tabla tienes un resumen de su significado
+
+| Métrica | Significado                        | Descripción                                                                 |
+|---------|------------------------------------|-----------------------------------------------------------------------------|
+| RSS     | Resident Set Size                  | Memoria física actualmente en uso por el proceso, incluyendo memoria compartida. |
+| PSS     | Proportional Set Size              | Porción proporcional de la memoria compartida más la memoria privada. Si una página es compartida entre 3 procesos, cada uno cuenta con 1/3 de su tamaño. |
+| USS     | Unique Set Size                    | Memoria exclusiva del proceso. No incluye ninguna porción de memoria compartida.  |
+
 
 ---
 

@@ -1,0 +1,46 @@
+/dts-v1/;
+
+   / {
+       description = "FIT image with kernel and FDT";
+       #address-cells = <1>;
+
+       images {
+           kernel@1 {
+               description = "Linux Kernel";
+               data = /incbin/("zImage");
+               type = "kernel";
+               arch = "arm";
+               os = "linux";
+               compression = "none";
+               load = <0x80008000>;
+               entry = <0x80008000>;
+               hash@1 {
+                   algo = "sha256";
+               };
+           };
+
+           fdt@1 {
+               description = "Device Tree";
+               data = /incbin/("am335x-bonegreen.dtb");
+               type = "flat_dt";
+               arch = "arm";
+               compression = "none";
+               hash@1 {
+                   algo = "sha256";
+               };
+           };
+       };
+
+       configurations {
+           default = "conf@1";
+           conf@1 {
+               kernel = "kernel@1";
+               fdt = "fdt@1";
+               signature@1 {
+                   algo = "rsa2048";
+                   key-name-hint = "devkey";
+                   sign-images = "kernel@1", "fdt@1";
+               };
+           };
+       };
+   };

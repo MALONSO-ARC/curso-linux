@@ -24,34 +24,30 @@ El desafío en sistemas embebidos es realizar este análisis con herramientas li
 ## 2. Uso de `top`, `htop`, `iotop` y `vmstat` para monitoreo
 
 ### `top`
-
 Muestra en tiempo real los procesos activos y su uso de CPU y memoria.
 ```bash
 top
 ```
 
 ### `htop`
-
 Versión interactiva y visual de `top`, útil para identificar procesos problemáticos.
 ```bash
 htop
 ```
 
 ### `iotop`
-
 Muestra procesos que generan I/O en disco.
 ```bash
 iotop
 ```
 
 ### `vmstat`
-
 Estadísticas de memoria, procesos, I/O y CPU.
 ```bash
 vmstat 1
 ```
 
-**Uso típico:** iniciar estas herramientas en segundo plano durante pruebas funcionales para detectar anomalías.
+**Consejo:** iniciar estas herramientas en segundo plano durante pruebas funcionales para detectar anomalías.
 
 ---
 
@@ -59,19 +55,34 @@ vmstat 1
 
 `perf` es una herramienta del kernel de Linux para analizar el comportamiento de programas.
 
-### Ejemplos de uso:
+### Ejemplos de uso básico:
 ```bash
 perf stat ./mi_aplicacion
 ```
-Muestra estadísticas generales (instrucciones, ciclos, fallos de caché).
+Muestra estadísticas generales: instrucciones ejecutadas, ciclos de CPU, fallos de caché.
 
 ```bash
 perf record ./mi_aplicacion
 perf report
 ```
-Captura y muestra un perfil de funciones ejecutadas, útil para identificar puntos calientes.
+Captura un perfil de funciones ejecutadas y muestra un informe visual del consumo por función.
 
-**Ventaja:** Bajo overhead, análisis detallado a nivel de instrucciones y símbolos.
+### Ejemplo práctico:
+```c
+// ejemplo_perf.c
+#include <stdio.h>
+int main() {
+    for (volatile int i = 0; i < 100000000; i++);
+    printf("Fin del bucle\n");
+    return 0;
+}
+```
+Compilar con símbolos:
+```bash
+gcc -g -O2 ejemplo_perf.c -o ejemplo_perf
+perf record ./ejemplo_perf
+perf report
+```
 
 ---
 
@@ -85,130 +96,170 @@ Activación manual:
 echo function > /sys/kernel/debug/tracing/current_tracer
 cat /sys/kernel/debug/tracing/trace
 ```
+Filtrar funciones:
+```bash
+echo 'mi_funcion' > /sys/kernel/debug/tracing/set_ftrace_filter
+```
 
 ### `trace-cmd`
-Herramienta avanzada para capturar trazas de `ftrace`.
+Herramienta avanzada para capturar y analizar trazas de `ftrace`.
 ```bash
 trace-cmd record -p function
 trace-cmd report
 ```
 
-**Aplicaciones:**
-- Análisis de interrupciones.
-- Diagnóstico de problemas en drivers.
-- Seguimiento de latencias del scheduler.
+**Aplicaciones comunes:**
+- Diagnóstico de latencias e interrupciones.
+- Análisis de drivers y scheduling.
 
 ---
 
-## 5. Medición de latencias con herramientas de tracing (`latencytop`)
+## 5. Medición de latencias con `latencytop`
 
 `latencytop` permite visualizar dónde se producen latencias en el sistema.
 
 ### Instalación:
 ```bash
-apt install latencytop
+sudo apt install latencytop
 ```
 
 ### Ejecución:
 ```bash
-latencytop
+sudo latencytop
 ```
 
 **Muestra:**
 - Latencias por syscall.
-- Motivos de espera (locks, I/O, swaps).
+- Motivos de espera: locks, acceso a disco, swaps.
 
-**Relevancia en sistemas embebidos:** Permite optimizar el comportamiento bajo condiciones de carga o tiempo real.
+**Importancia:** Especialmente útil en sistemas con requerimientos de tiempo real o baja latencia.
 
 ---
 
 ## 6. Análisis de cuellos de botella con `sysstat`
 
-El paquete `sysstat` incluye herramientas como:
-
+El paquete `sysstat` incluye:
 - `iostat`: estadísticas de dispositivos de almacenamiento.
 - `mpstat`: uso de CPU por núcleo.
 - `pidstat`: consumo por proceso.
 
-### Ejemplo:
+### Uso práctico:
 ```bash
 iostat -x 1
+mpstat -P ALL 1
 pidstat -r -u -d 1
 ```
 
-**Aplicaciones:**
-- Detección de procesos con alto uso de disco o CPU.
-- Identificación de esperas excesivas de I/O.
+**Consejo:** Ejecutar durante pruebas intensivas para detectar procesos o recursos saturados.
 
 ---
 
 ## 7. Uso de `strace` para analizar llamadas al sistema
 
-`strace` permite interceptar y registrar llamadas al sistema realizadas por un programa.
+`strace` intercepta llamadas al sistema y señales generadas por un programa.
 
 ### Ejemplo básico:
 ```bash
 strace ./mi_aplicacion
 ```
 
-### Filtrar por tipo:
+### Filtrado y tiempo:
 ```bash
-strace -e open,read,write ./mi_aplicacion
+strace -e trace=open,read,write -T ./mi_aplicacion
 ```
 
 **Aplicaciones:**
-- Diagnóstico de errores de ejecución.
-- Análisis de accesos a archivos o sockets.
-- Medición de tiempos por syscall (`-T`).
+- Diagnóstico de fallos (archivos no encontrados, permisos).
+- Análisis de rendimiento (tiempo por syscall).
 
 ---
 
 ## 8. Técnicas avanzadas de profiling con `LTTng`
 
-**LTTng (Linux Trace Toolkit Next Generation)** permite tracing de bajo overhead con granularidad a nivel de eventos del kernel y espacio de usuario.
+**LTTng** es una solución avanzada para tracing de espacio de usuario y kernel.
 
-### Ejemplo:
+### Pasos básicos:
 ```bash
-lttng create mi-traza
+lttng create sesion
 lttng enable-event -a -k
 lttng start
-# ejecutar aplicación
+./mi_aplicacion
 lttng stop
 lttng view
 ```
 
+### Integración con Babeltrace:
+Permite convertir trazas a formato legible o exportarlas para análisis gráfico.
+
 **Ventajas:**
-- Integración con Babeltrace.
-- Trazas detalladas, útiles para tiempos de respuesta o análisis en sistemas de producción.
+- Bajo overhead.
+- Detalles temporales precisos.
+
+**Ideal para:**
+- Sistemas con carga constante.
+- Análisis profundo de interacción kernel/usuario.
 
 ---
 
 ## 9. Optimización de rendimiento basada en análisis de profiling
 
-El profiling no solo sirve para diagnosticar problemas, sino también para optimizar:
+Una vez identificados los cuellos de botella, se pueden aplicar optimizaciones:
 
-- **Reducir carga de CPU:** evitar polling, optimizar algoritmos.
-- **Reducir I/O:** agrupar escrituras, usar buffers.
-- **Minimizar latencias:** evitar bloqueos, reordenar prioridades.
-- **Optimizar uso de memoria:** identificar fugas, ajustar tamaños de pila/heap.
+- **Reducir carga de CPU:**
+  - Evitar bucles de polling.
+  - Usar interrupciones o eventos.
 
-**Ejemplo:** tras observar en `perf` que una función de decodificación consume el 50% del tiempo, se reescribe usando una librería optimizada con SIMD.
+- **Reducir I/O:**
+  - Agrupar escrituras.
+  - Evitar accesos innecesarios a disco.
+
+- **Minimizar latencias:**
+  - Evitar bloqueos por mutex.
+  - Usar prioridades adecuadas (real-time).
+
+- **Optimizar memoria:**
+  - Identificar fugas con Valgrind.
+  - Ajustar pilas en hilos o buffers.
+
+### Ejemplo:
+```c
+// Uso ineficiente
+while (1) {
+  if (check_socket()) procesar();
+  usleep(1000);
+}
+
+// Optimización
+select(...);
+```
 
 ---
 
 ## 10. Casos de estudio en profiling y tracing en sistemas embebidos
 
 ### Caso 1: Gateway IoT lento al iniciar
-- Se usa `bootchart` y `perf` para determinar que `systemd` espera un servicio innecesario.
-- Se deshabilita dicho servicio, reduciendo el tiempo de arranque en 2 segundos.
+- Se usa `bootchart` y `perf`.
+- Se detecta que `systemd` espera un servicio innecesario.
+- Al eliminarlo, el arranque se reduce de 9s a 6.5s.
 
 ### Caso 2: Dispositivo con bloqueos intermitentes
-- `ftrace` revela que un driver mal implementado mantiene deshabilitadas las interrupciones.
-- Se corrige el driver, eliminando las pausas.
+- `ftrace` revela que un driver mal implementado bloquea interrupciones.
+- Al corregirlo, las pausas desaparecen.
 
 ### Caso 3: Uso excesivo de CPU
-- `htop` y `perf` detectan que una rutina de chequeo de red usa `sleep` en vez de `select`.
-- Se refactoriza, reduciendo uso de CPU del 40% al 3%.
+- `htop` y `perf` detectan que una rutina de red hace polling.
+- Se cambia a `select()` y el uso de CPU baja del 40% al 3%.
+
+---
+
+## Recursos adicionales
+
+- [LTTng Documentation](https://lttng.org/docs)
+- [perf wiki](https://perf.wiki.kernel.org)
+- [Linux Tracing Toolkit](https://lttng.org/)
+- "Linux Performance" - Brendan Gregg
+- "Mastering Embedded Linux Programming"
+
 
 
 
