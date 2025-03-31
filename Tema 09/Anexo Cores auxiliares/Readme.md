@@ -2,6 +2,8 @@
 
 Los SoCs de la familia i.MX8, como los utilizados en las placas de Toradex (Colibri iMX8X, Apalis iMX8, entre otros), integran cores Cortex-A y Cortex-M que pueden colaborar en sistemas heterogéneos. Esta sección describe cómo manejar estos cores auxiliares desde U-Boot y Linux, y cómo establecer comunicación entre ellos usando `rpmsg`.
 
+[Heterogeneous Multi-core Processing (HMP)](https://developer.toradex.com/software/cortex-m/)
+
 ---
 
 ### Arranque del Core Auxiliar desde U-Boot (`bootaux`)
@@ -18,8 +20,8 @@ make menuconfig
 Activar:
 
 ```
--> Command line interface
-   -> Enable bootaux command [CONFIG_CMD_BOOTAUX]
+-> ARM architectrue
+   -> [*] Support boot auxiliary core
 ```
 
 2. Verificar que el archivo `arch/arm/imx_bootaux.c` esté incluido en la compilación. Este contiene la implementación del comando `bootaux` para plataformas i.MX.
