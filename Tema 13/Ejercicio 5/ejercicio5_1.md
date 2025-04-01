@@ -110,7 +110,7 @@ inux-embebido audit[3030]: AVC apparmor="DENIED"operation="open" ...
 ## 🧹 Limpieza (opcional)
 
 ```bash
-sudo aa-disable /etc/apparmor.d/home.usr.prueba.sh
+sudo aa-disable /etc/apparmor.d/home.linux.prueba.sh
 rm /home/linux/prueba.sh
 rm /home/linux/archivo.txt
 ```
