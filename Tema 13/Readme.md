@@ -20,19 +20,108 @@ Los sistemas embebidos presentan desafíos de seguridad particulares debido a su
 
 ## 2. Modelado de amenazas y análisis de riesgos
 
-Antes de implementar contramedidas, es vital identificar posibles vectores de ataque y evaluar el impacto que tendrían.
-
-**Pasos comunes:**
-1. Identificar activos (firmware, credenciales, interfaces de red...)
-2. Evaluar amenazas (ataques físicos, MITM, actualización maliciosa...)
-3. Analizar vulnerabilidades (puertos abiertos, protocolos inseguros...)
-4. Estimar el riesgo: _riesgo = impacto × probabilidad_
-
-**Herramientas útiles:** STRIDE, DREAD, TARA (Threat Analysis and Risk Assessment).
-
-**Ejemplo:** En un gateway IoT se evalúa la posibilidad de un ataque remoto que reemplace el firmware. Se valora implementar autenticación de actualizaciones y arranque seguro.
+### Objetivos
+- Identificar los activos críticos del sistema.
+- Evaluar amenazas relevantes.
+- Detectar vulnerabilidades existentes.
+- Estimar y priorizar los riesgos.
 
 ---
+
+### 🔍 1. Identificación de Activos
+
+| Tipo de Activo        | Ejemplos                                             |
+|------------------------|------------------------------------------------------|
+| Firmware               | Particiones de arranque, código de aplicación       |
+| Credenciales           | Usuarios del sistema, claves privadas               |
+| Interfaces físicas     | UART, JTAG, SPI, I2C                                |
+| Interfaces de red      | Ethernet, WiFi, Bluetooth                           |
+| Almacenamiento         | Configuración persistente, variables de entorno     |
+| Elementos conectados   | Sensores, actuadores                                |
+| Mecanismos de actualización | OTA, USB, interfaces debug                     |
+
+---
+
+### 2. Evaluación de Amenazas
+
+#### Tipos comunes
+- Ataques físicos (JTAG, glitching, extracción de memoria)
+- Ataques remotos (MITM, escalada de privilegios)
+- Ataques al firmware (inyección o reemplazo)
+- Backdoors, contraseñas débiles, puertos abiertos
+
+#### Método STRIDE
+
+| Letra | Amenaza               | Ejemplo embebido                             |
+|-------|------------------------|----------------------------------------------|
+| S     | Spoofing               | Suplantación vía UART o SSH                  |
+| T     | Tampering              | Modificación de firmware                     |
+| R     | Repudiation            | Falta de logs de auditoría                   |
+| I     | Information Disclosure | Fugas por UART o bus compartido              |
+| D     | Denial of Service      | Sobrecarga de CPU o red                      |
+| E     | Elevation of Privilege| Root desde servicio vulnerable               |
+
+---
+
+### Análisis de Vulnerabilidades
+
+| Elemento                  | Posible Vulnerabilidad                        |
+|---------------------------|-----------------------------------------------|
+| Servicios de red          | Puertos abiertos, protocolos inseguros        |
+| Firmware                  | Sin autenticación o cifrado                   |
+| Interfaz debug            | UART/JTAG habilitado en producción            |
+| Configuración del sistema | Contraseñas por defecto, permisos incorrectos |
+| Drivers                   | Acceso sin restricciones                     |
+
+**Herramientas útiles:**
+- OpenVAS / Nessus → escaneo de servicios
+- Binwalk, Firmware-Mod-Kit → análisis de firmware
+- Lynis, Tiger → auditoría de seguridad Linux
+
+---
+
+### 📊 4. Estimación del Riesgo
+
+#### Fórmula base:
+Riesgo = Impacto × Probabilidad
+
+
+#### Método DREAD
+
+| Letra | Métrica         | Descripción                                      |
+|-------|------------------|--------------------------------------------------|
+| D     | Damage           | Daño que puede causar                           |
+| R     | Reproducibility  | Facilidad para repetir el ataque                |
+| E     | Exploitability   | Facilidad para explotar                         |
+| A     | Affected users   | Usuarios impactados                             |
+| D     | Discoverability  | Facilidad para descubrir la vulnerabilidad      |
+
+Se asigna un valor numérico a cada métrica y se promedia.
+
+
+### 5. Método TARA (Automoción y sistemas críticos)
+
+1. Identificación de activos
+2. Escenarios de amenaza
+3. Factibilidad del ataque
+4. Estimación del impacto
+5. Clasificación del riesgo
+
+
+### 📦 6. Ejemplo: Dron de Vigilancia con Visión Artificial
+
+**Contexto:** Dron autónomo que transmite vídeo en tiempo real vía WiFi y se controla remotamente.
+
+| Elemento                  | Detalle                                              |
+|---------------------------|------------------------------------------------------|
+| Activo                    | Firmware de vuelo y visión, claves de acceso         |
+| Amenaza                   | Inyección de firmware modificado para redirigir vuelo|
+| Vector                    | Acceso remoto a interfaz OTA no autenticada          |
+| Impacto                   | Alto – pérdida de control, filtración de datos       |
+| Probabilidad              | Media – requiere acceso a la red + conocimiento      |
+| Riesgo estimado           | Alto                                                 |
+| Contramedidas             | Secure Boot, cifrado de comunicaciones, OTA firmada |
+
 
 ## 3. Introducción a Secure Boot y su implementación en U-Boot
 
@@ -256,6 +345,54 @@ Recursos:
 [meta-security](https://layers.openembedded.org/layerindex/branch/master/layer/meta-security/)  
 [meta-selinux](https://layers.openembedded.org/layerindex/branch/master/layer/meta-selinux/)  
 [App Armor cheatsheet](../assets/apparmor.md)
+
+## 🛡️ Comparativa: SELinux vs AppArmor
+
+| Característica                  | SELinux                                        | AppArmor                                      |
+|--------------------------------|------------------------------------------------|-----------------------------------------------|
+| **Modelo de seguridad**        | Basado en etiquetas (label-based)             | Basado en rutas de archivos (path-based)      |
+| **Grano de control**           | Muy fino, control total sobre objetos         | Menos granular, más fácil de entender         |
+| **Complejidad**                | Alta                                           | Moderada                                      |
+| **Facilidad de configuración** | Más complejo (requiere política completa)     | Más sencillo (perfil por aplicación)          |
+| **Flexibilidad**               | Alta (control sobre casi todos los aspectos)  | Limitada a archivos y procesos definidos      |
+| **Soporte en distros**         | Fedora, RHEL, CentOS, Debian (opcional)       | Ubuntu, Debian (por defecto), SUSE            |
+| **Herramientas disponibles**   | `semanage`, `audit2allow`, `setenforce`       | `aa-genprof`, `aa-enforce`, `aa-complain`     |
+| **Tipo de políticas**          | Módulos con políticas complejas (MLS, RBAC)   | Perfiles más simples por aplicación           |
+| **Soporte para contenedores**  | Integrado en RHEL + Podman/Kubernetes         | Soporte básico (mejor con LXD, Snap)          |
+| **Documentación y comunidad**  | Amplia pero más técnica                       | Más amigable para principiantes               |
+| **Interoperabilidad**          | Mejor en entornos con muchas etiquetas        | Más limitado en sistemas heterogéneos         |
+
+> ⚠️ Ambos sistemas **no pueden funcionar simultáneamente** en modo enforcing.
+
+
+## 🌿 Modelo Label-Based en SELinux
+
+```text
++----------------------+        intenta acceder a         +----------------------+
+|  Proceso: httpd_t    |  ----------------------------->  |  Archivo: index.html |
++----------------------+                                   +----------------------+
+   Etiqueta SELinux:                                       Etiqueta SELinux:
+   system_u:system_r:httpd_t:s0                            system_u:object_r:httpd_sys_content_t:s0
+
+                            🔍 Evaluación de política
+                            --------------------------------
+                            ¿Puede un proceso con tipo httpd_t
+                            acceder a un objeto con tipo
+                            httpd_sys_content_t?
+
+                                     ✅ SÍ (permitido por la política)
+                                     ❌ NO (bloqueado por SELinux)
+```
+
+---
+
+### 🧠 Claves del Modelo Label-Based
+
+- **Proceso** (sujeto): tiene una etiqueta que indica su tipo (`httpd_t`).
+- **Objeto** (archivo, directorio, etc.): tiene otra etiqueta (`httpd_sys_content_t`).
+- La política de SELinux define qué interacciones entre tipos están **permitidas** o **denegadas**.
+
+> Esto permite un modelo de seguridad **más robusto y flexible** que los permisos tradicionales.
 
 
 

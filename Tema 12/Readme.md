@@ -158,7 +158,3 @@ gpio_set_value(DEBUG_LED, 1); // encender LED al entrar en función
 5. **Depuración remota**:
    - Ejecutar `gdbserver` en el objetivo y conectar desde el host.
 
----
-
-La depuración en Linux embebido requiere conocimiento de herramientas, paciencia y metodología. Con las técnicas y ejemplos adecuados, es posible resolver problemas complejos incluso en los sistemas más limitados.
-
