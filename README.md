@@ -1,5 +1,3 @@
-# Curso de Linux Embebido
-
 ## Temas
 - **Tema 1: Introducción a Linux Embebido**
 - **Tema 2: Entorno de desarrollo en Linux embebido**
@@ -49,6 +47,9 @@ Tener descargada en VirtualBox y probada la Máquina Virtual (LinuxUbuntu 22.04 
 
 Mínimos de Equipo: SO Windows o Linux, 200 GB de espacio libre en el disco, 16 GB de RAM y un procesador con 4 núcleos físicos (8 cores en total) para permitir la paralelización de tareas, como, las compilaciones.
 Tener permisos de instalación en el equipo, contar con una conexión aInternet estable, Zoom Desktop instalado con cámara, auriculares,micrófono y segunda pantalla configurados.
+
+## Autor
+Carlos Aldea - CODING ALCHEMY
 
 <!-- Add Table of contents with links to all readme in subfolders   -->
 
