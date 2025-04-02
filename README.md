@@ -1,5 +1,35 @@
 # Curso de Linux Embebido
 
+## Temas
+- **Tema 1: Introducción a Linux Embebido**
+- **Tema 2: Entorno de desarrollo en Linux embebido**
+- **Tema 3: Repaso de Linux**
+- **Tema 4: Toolchain (Herramientas de Compilación)**
+- **Tema 5: Bootloader**
+- **Tema 6: Linux Kernel**
+- **Tema 7: Sistema de Archivos Root (RootFS)**
+- **Tema 8: Proyecto Yocto**
+- **Tema 9: Board Support Package (BSP) en Linux Embebido**
+- **Tema 10: Procesos e Hilos en Linux Embebido**
+- **Tema 11: Control de Memoria en Linux Embebido**
+- **Tema 12: Depuración en Linux Embebido**
+- **Tema 13: Seguridad en Linux Embebido**
+- **Tema 14: Profiling y Tracing en Linux Embebido**
+- **Tema 15: Linux en Tiempo Real (Real-Time Linux)**
+
+## Assets
+- Uso de TPM en U-Boot y Linux Embebido  
+- AppArmor Cheatsheet  
+- Ejemplo IOCTLs (paso de datos entre kernel y userspace)  
+- Cheat Sheet: libgpiod – Control de GPIOs en Linux moderno  
+- Linux Embebido - Cheat Sheet de Comandos Esenciales  
+- linux_on_safety_critical_cheatsheet  
+- Pthread Cheatsheet (Hilos POSIX en C)  
+- variables_local_conf_cheatsheet  
+- Yocto Cheatsheet  
+- Yocto Recipe Cheatsheet
+
+
 ## Introducción
 En este curso aprenderás todo lo necesario para desarrollar con Linux embebido. Aprenderás a trabajar con el kernel de linux para crear sistemas embebidos más optimizados, ligeros y adaptados.
 
@@ -19,4 +49,7 @@ Tener descargada en VirtualBox y probada la Máquina Virtual (LinuxUbuntu 22.04 
 
 Mínimos de Equipo: SO Windows o Linux, 200 GB de espacio libre en el disco, 16 GB de RAM y un procesador con 4 núcleos físicos (8 cores en total) para permitir la paralelización de tareas, como, las compilaciones.
 Tener permisos de instalación en el equipo, contar con una conexión aInternet estable, Zoom Desktop instalado con cámara, auriculares,micrófono y segunda pantalla configurados.
+
+<!-- Add Table of contents with links to all readme in subfolders   -->
+
 
