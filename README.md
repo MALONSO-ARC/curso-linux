@@ -1,3 +1,5 @@
+# Curso de Linux Embebido
+
 ## Temas
 - **Tema 1: Introducción a Linux Embebido**
 - **Tema 2: Entorno de desarrollo en Linux embebido**
@@ -21,9 +23,9 @@
 - Ejemplo IOCTLs (paso de datos entre kernel y userspace)  
 - Cheat Sheet: libgpiod – Control de GPIOs en Linux moderno  
 - Linux Embebido - Cheat Sheet de Comandos Esenciales  
-- linux_on_safety_critical_cheatsheet  
+- Linux en Sistemas Safety-Critical Cheatsheet   
 - Pthread Cheatsheet (Hilos POSIX en C)  
-- variables_local_conf_cheatsheet  
+- Yocto Variables Glossary Cheatsheet 
 - Yocto Cheatsheet  
 - Yocto Recipe Cheatsheet
 
