@@ -229,6 +229,8 @@ lttng view
 babeltrace ~/lttng-traces/mi_sesion-*/
 ```
 
+[trace-compass](https://eclipse.mirror.liteserver.nl/tracecompass/releases/10.3.0/rcp/trace-compass-10.3.0-20250313-1426-linux.gtk.x86_64.tar.gz)
+
 Ventajas:
 - Bajo overhead.
 - Precisión temporal.
